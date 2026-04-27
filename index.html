@@ -3,209 +3,591 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EVA MAX PRO</title>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
+<title>EVA PRO</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 <style>
-body{background:#060A0E;color:#fff;font-family:sans-serif;padding:20px}
-h1{color:#FF6B00}
-.box{border:1px solid #333;padding:15px;margin-top:15px;border-radius:10px}
-button{padding:12px;border:none;border-radius:10px;margin:5px;cursor:pointer;background:#FF6B00;color:#fff}
-#drop{border:2px dashed #FF6B00;padding:30px;text-align:center;margin-top:10px}
-#progress{height:10px;background:#222;margin-top:10px;border-radius:10px;overflow:hidden}
-#bar{height:100%;width:0;background:#1DB954}
-pre{max-height:250px;overflow:auto;background:#000;padding:10px}
+  .container { max-width: 1200px; margin: 0 auto; padding: 16px; }
+  .card { margin-bottom: 14px; padding: 14px; border: 1px solid #ddd; border-radius: 10px; }
+  .btn { margin-right: 8px; margin-top: 8px; cursor: pointer; }
+  .btn-group { display: flex; flex-wrap: wrap; gap: 8px; }
+  .muted { color: #666; font-size: 0.9rem; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .row input, .row select { padding: 8px; min-width: 200px; }
+  .stats { display: grid; grid-template-columns: repeat(4, minmax(120px, 1fr)); gap: 10px; margin-top: 10px; }
+  .stat { border: 1px solid #ddd; border-radius: 8px; padding: 10px; }
+  .stat strong { display: block; font-size: 1.2rem; }
+  .hidden { display: none; }
+  table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+  th, td { border-bottom: 1px solid #eee; padding: 8px; text-align: left; }
+  .ok { color: #14833b; font-weight: 700; }
+  .bad { color: #c0352a; font-weight: 700; }
+  .warn { color: #a06a00; }
+  .pagination { display: flex; gap: 8px; align-items: center; margin-top: 12px; }
+  .detail-box, .analysis-box { margin-top: 12px; border: 1px solid #ddd; border-radius: 10px; padding: 12px; }
+  .small-table { max-height: 260px; overflow: auto; }
+  .view-toggle { margin-top: 10px; margin-bottom: 6px; }
+  .view-toggle .btn.active { font-weight: 700; border: 1px solid #bbb; }
+  .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; margin-top: 12px; }
+  .p-card { border: 1px solid #ddd; border-radius: 10px; overflow: hidden; background: #fff; }
+  .p-card img { width: 100%; height: 180px; object-fit: cover; background: #f4f4f4; }
+  .p-card .ph { height: 180px; display: flex; align-items: center; justify-content: center; background: #f4f4f4; color: #999; }
+  .p-card-body { padding: 10px; }
+  .p-title { font-weight: 700; margin-bottom: 6px; line-height: 1.3; min-height: 42px; }
+  .p-meta { font-size: 0.9rem; margin-bottom: 4px; color: #444; }
+  .badge-status { display: inline-block; padding: 3px 8px; border-radius: 999px; font-size: 0.8rem; margin-bottom: 8px; }
+  .badge-status.ok { background: #e8f6ec; color: #14833b; }
+  .badge-status.bad { background: #fdeceb; color: #c0352a; }
+  .modal { position: fixed; inset: 0; background: rgba(0,0,0,.5); display: none; align-items: center; justify-content: center; z-index: 9999; padding: 16px; }
+  .modal.show { display: flex; }
+  .modal-box { width: min(980px, 100%); max-height: 95vh; overflow: auto; background: #fff; border-radius: 12px; padding: 14px; }
+  .modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .gallery-main { width: 100%; max-height: 380px; object-fit: contain; border: 1px solid #eee; border-radius: 10px; background: #fafafa; }
+  .thumbs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .thumbs img { width: 76px; height: 76px; object-fit: cover; border: 1px solid #ddd; border-radius: 8px; cursor: pointer; }
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 10px; }
+  @media (max-width: 860px){ .detail-grid { grid-template-columns: 1fr; } }
+  .params-table td, .params-table th { font-size: 0.9rem; }
 </style>
 </head>
-
 <body>
+<div class="container">
+  <h1>🔥 EVA Validator PRO</h1>
 
-<h1>🔥 EVA MAX PRO</h1>
+  <div class="card">
+    <h3>Excel → XML</h3>
+    <input type="file" id="excel">
+    <div class="btn-group">
+      <button onclick="convert()" class="btn orange">Конвертувати</button>
+    </div>
+  </div>
 
-<div id="drop" ondrop="drop(event)" ondragover="event.preventDefault()">
-<input type="file" id="file">
+  <div class="card">
+    <h3>Валідація XML</h3>
+    <p class="muted">Підтримка файлів до 300 МБ через URL або локальний файл.</p>
+
+    <div class="row">
+      <input type="file" id="xml" accept=".xml">
+      <input id="url" placeholder="https://example.com/feed.xml">
+    </div>
+
+    <div class="btn-group">
+      <button onclick="checkUrl()" class="btn green">Перевірити URL</button>
+      <button onclick="validate()" class="btn green">Перевірити</button>
+    </div>
+
+    <div id="result" class="stats hidden"></div>
+
+    <div id="filtersCard" class="detail-box hidden">
+      <h4>Таблиця товарів</h4>
+      <div class="row">
+        <input id="qSearch" placeholder="Пошук по ID, назві, бренду..." oninput="applyFilters()">
+        <select id="statusFilter" onchange="applyFilters()">
+          <option value="all">Всі</option>
+          <option value="valid">Тільки валідні</option>
+          <option value="invalid">Тільки з помилками</option>
+        </select>
+        <select id="categoryFilter" onchange="applyFilters()">
+          <option value="all">Всі категорії</option>
+        </select>
+      </div>
+
+      <div class="view-toggle">
+        <button class="btn active" id="viewTableBtn" onclick="setViewMode('table')">Таблиця</button>
+        <button class="btn" id="viewCardsBtn" onclick="setViewMode('cards')">Картки</button>
+      </div>
+
+      <div class="small-table">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Назва</th>
+              <th>Категорія</th>
+              <th>Ціна</th>
+              <th>Статус</th>
+              <th>Дія</th>
+            </tr>
+          </thead>
+          <tbody id="productsBody"></tbody>
+        </table>
+      </div>
+      <div id="productsCards" class="cards-grid hidden"></div>
+
+      <div class="pagination">
+        <button class="btn" onclick="changePage(-1)">◀</button>
+        <span id="pageInfo">1 / 1</span>
+        <button class="btn" onclick="changePage(1)">▶</button>
+      </div>
+    </div>
+
+    <div id="detailCard" class="detail-box hidden"></div>
+    <div id="analysisCard" class="analysis-box hidden"></div>
+  </div>
 </div>
 
-<div class="box">
-<button onclick="convert()">🔄 Excel → XML</button>
-<button onclick="validate()">✅ Validate</button>
-<button onclick="downloadXML()">⬇️ XML</button>
-<button onclick="downloadErrors()">📥 Errors XLSX</button>
-<button onclick="loadXMLUrl()">🌐 Load XML URL</button>
-<button onclick="ai()">🤖 AI</button>
+<div id="loader" class="hidden">⏳</div>
+<div id="popup" class="popup"></div>
+<div id="productModal" class="modal" onclick="closeProductModal(event)">
+  <div class="modal-box" id="productModalBox"></div>
 </div>
-
-<div id="progress"><div id="bar"></div></div>
-
-<div class="box" id="stats"></div>
-<div class="box"><pre id="xmlPreview"></pre></div>
-<div class="box" id="result"></div>
 
 <script>
+const MAX_SIZE_BYTES = 300 * 1024 * 1024;
+const PAGE_SIZE = 10;
+let allProducts = [];
+let filteredProducts = [];
+let currentPage = 1;
+let currentViewMode = "table";
 
-let data=null
-let xml=""
-let errorRows=[]
-let xmlLoaded=""
+function showLoader(){document.getElementById("loader").classList.remove("hidden");}
+function hideLoader(){document.getElementById("loader").classList.add("hidden");}
 
-document.getElementById("file").onchange=e=>{
- loadFile(e.target.files[0])
+function showPopup(t,ok=true){
+  let p=document.getElementById("popup");
+  p.innerText=t;
+  p.className="popup show "+(ok?"success":"error");
+  setTimeout(()=>p.className="popup",2000);
 }
 
-function drop(e){
- e.preventDefault()
- loadFile(e.dataTransfer.files[0])
+function escapeHtml(v){
+  return String(v ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
 
-function loadFile(file){
- const reader=new FileReader()
- reader.onload=e=>{
-  const wb=XLSX.read(e.target.result,{type:"array"})
-  const ws=wb.Sheets[wb.SheetNames[0]]
-  data=XLSX.utils.sheet_to_json(ws,{defval:""})
-  stats("📊 Завантажено: "+data.length)
- }
- reader.readAsArrayBuffer(file)
+async function convert(){
+  let f=document.getElementById("excel").files[0];
+  if(!f) return showPopup("Вибери файл",false);
+  showLoader();
+  try{
+    let fd=new FormData();
+    fd.append("file",f);
+    let r=await fetch("/convert",{method:"POST",body:fd});
+    let b=await r.blob();
+    let a=document.createElement("a");
+    a.href=URL.createObjectURL(b);
+    a.download="eva.xml";
+    a.click();
+    showPopup("XML готовий");
+  }catch{
+    showPopup("Не вдалося конвертувати",false);
+  }finally{
+    hideLoader();
+  }
 }
 
-function progress(p){
- document.getElementById("bar").style.width=p+"%"
+async function checkUrl(){
+  let url=document.getElementById("url").value.trim();
+  if(!url) return showPopup("Встав URL",false);
+  showLoader();
+  try{
+    let r=await fetch("/check_url",{
+      method:"POST",
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({url})
+    });
+    let d=await r.json();
+    showPopup(d.ok?"URL працює":"URL не працює",d.ok);
+  }catch{
+    showPopup("Помилка перевірки URL",false);
+  }finally{
+    hideLoader();
+  }
 }
 
-function stats(t){
- document.getElementById("stats").innerHTML=t
-}
-
-function convert(){
- if(!data)return alert("нема excel")
-
- let offers=""
- let brands=new Set()
- let cats=new Set()
- let ids=new Set()
- errorRows=[]
-
- data.forEach((r,i)=>{
-  progress(i/data.length*100)
-
-  let err=[]
-
-  if(!r["Offer ID"]) err.push("немає Offer ID")
-  if(ids.has(r["Offer ID"])) err.push("дублікат ID")
-  if(!r["Цена"]) err.push("немає ціни")
-  if(!r["Название (украинский)"]) err.push("немає назви")
-  if(!r["Бренд"]) err.push("немає бренд")
-  if(!r["Категория"]) err.push("немає категорія")
-  if(!r["Описание (украинский)"]) err.push("немає опис")
-  if(!r["Изображения"]) err.push("немає фото")
-
-  if(err.length){
-    errorRows.push([i+1, err.join(", ")])
-    return
+async function loadXmlTextFromSource(file,url){
+  if(file){
+    if(file.size > MAX_SIZE_BYTES){
+      throw new Error("Файл перевищує 300 МБ");
+    }
+    return await file.text();
   }
 
-  ids.add(r["Offer ID"])
-  brands.add(r["Бренд"])
-  cats.add(r["Категория"])
+  if(!url) throw new Error("Додай файл або URL");
+  let finalUrl = url.startsWith("http") ? url : `https://${url}`;
+  const proxies = [
+    finalUrl,
+    "https://corsproxy.io/?" + encodeURIComponent(finalUrl),
+    "https://api.allorigins.win/raw?url=" + encodeURIComponent(finalUrl)
+  ];
 
-  let pics=r["Изображения"].split(",").slice(0,15)
-    .map(p=>`<picture>${p.trim()}</picture>`).join("")
+  for(const p of proxies){
+    try{
+      const r = await fetch(p);
+      if(!r.ok) continue;
+      const blob = await r.blob();
+      if(blob.size > MAX_SIZE_BYTES) throw new Error("XML через URL перевищує 300 МБ");
+      const text = await blob.text();
+      if(text.trim().startsWith("<")) return text;
+    }catch(err){
+      if(err.message.includes("300 МБ")) throw err;
+    }
+  }
 
-  offers+=`
-<offer id="${r["Offer ID"]}" available="true">
-<price>${r["Цена"]}</price>
-<currencyId>UAH</currencyId>
-<categoryId>${r["ID Категории"]||1}</categoryId>
-${pics}
-<vendor>${r["Бренд"]}</vendor>
-<name_ua>${r["Название (украинский)"]}</name_ua>
-<description_ua>${r["Описание (украинский)"]}</description_ua>
-</offer>`
- })
-
- xml=`<offers>${offers}</offers>`
-
- document.getElementById("xmlPreview").textContent=xml.substring(0,3000)
-
- stats(
- "📦 Товари: "+data.length+
- "<br>🏷 Бренди: "+brands.size+
- "<br>📂 Категорії: "+cats.size+
- "<br>❌ Помилки: "+errorRows.length
- )
+  throw new Error("Не вдалося завантажити XML через URL");
 }
 
-function validate(){
- let src = xmlLoaded || xml
- if(!src)return alert("нема xml")
+function analyzeXml(xmlText){
+  if(/[\x00-\x08\x0B\x0C\x0E-\x1F]/.test(xmlText)){
+    throw new Error("XML містить недруковані ASCII символи (0-31), що заборонено EVA");
+  }
 
- let err=0
+  const doc = new DOMParser().parseFromString(xmlText, "text/xml");
+  if(doc.querySelector("parsererror")) throw new Error("XML невалідний");
+  const root = doc.querySelector("yml_catalog");
+  if(!root) throw new Error("Відсутній кореневий тег yml_catalog");
+  const rootDate = root.getAttribute("date") || "";
+  const dateOk = /^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}$/.test(rootDate);
 
- if(!src.includes("<offer")) err++
- if(!src.includes("<price>")) err++
- if(!src.includes("<vendor>")) err++
- if(!src.includes("<name_ua>")) err++
+  const shop = doc.querySelector("shop");
+  if(!shop) throw new Error("Відсутній обов'язковий тег shop");
+  if(!shop.querySelector("currencies")) throw new Error("Відсутній обов'язковий тег currencies");
+  if(!shop.querySelector("categories")) throw new Error("Відсутній обов'язковий тег categories");
+  if(!shop.querySelector("offers")) throw new Error("Відсутній обов'язковий тег offers");
 
- result(err? "❌ Помилки: "+err : "✅ XML валідний")
+  const offers = [...doc.querySelectorAll("shop > offers > offer")];
+  const categories = new Set([...doc.querySelectorAll("categories > category")].map(c => c.getAttribute("id") || ""));
+  const ids = new Set();
+  const namesUa = new Set();
+  const attrCounts = {};
+  const paramNameCounts = {};
+  const products = [];
+
+  for(const offer of offers){
+    const id = offer.getAttribute("id") || "—";
+    const categoryId = offer.querySelector("categoryId")?.textContent?.trim() || "—";
+    const name = offer.querySelector("name_ua")?.textContent?.trim() || offer.querySelector("name")?.textContent?.trim() || "—";
+    const price = offer.querySelector("price")?.textContent?.trim() || "—";
+    const vendor = offer.querySelector("vendor")?.textContent?.trim() || "—";
+    const currencyId = offer.querySelector("currencyId")?.textContent?.trim() || "—";
+    const descriptionUa = offer.querySelector("description_ua")?.textContent?.trim() || "";
+    const description = offer.querySelector("description")?.textContent?.trim() || "";
+    const article = offer.querySelector("article")?.textContent?.trim() || "";
+    const nameRu = offer.querySelector("name")?.textContent?.trim() || "";
+    const priceOldRaw = offer.querySelector("price_old")?.textContent?.trim() || offer.querySelector("old_price")?.textContent?.trim() || "";
+    const priceNum = Number(String(price).replace(",", "."));
+    const priceOldNum = Number(String(priceOldRaw).replace(",", "."));
+    const pictureUrls = [...offer.querySelectorAll("picture")]
+      .map(p => p.textContent?.trim() || "")
+      .filter(Boolean);
+    const params = [...offer.querySelectorAll("param")].map(p => ({
+      name: (p.getAttribute("name") || "без назви").trim(),
+      value: (p.textContent || "").trim()
+    }));
+    const errors = [];
+    const warnings = [];
+
+    if(!dateOk) errors.push("атрибут yml_catalog@date не відповідає формату YYYY-MM-DD hh:mm");
+    if(id === "—") errors.push("немає id");
+    if(ids.has(id) && id !== "—") errors.push("дублікат id");
+    ids.add(id);
+    if(!offer.querySelector("price")) errors.push("немає price");
+    if(!Number.isFinite(priceNum) || priceNum <= 0) errors.push("некоректне значення price");
+    if(!offer.querySelector("currencyId")) errors.push("немає currencyId");
+    if(!["UAH","USD","EUR"].includes(currencyId)) errors.push("currencyId має бути UAH, USD або EUR");
+    if(!offer.querySelector("categoryId")) errors.push("немає categoryId");
+    if(!offer.querySelector("picture")) errors.push("немає picture");
+    if(pictureUrls.length > 15) errors.push("кількість picture перевищує 15");
+    if(pictureUrls.some(u => u.length > 1999)) errors.push("picture URL довше 1999 символів");
+    if(pictureUrls.some(u => /\s/.test(u))) errors.push("picture URL містить пробіли");
+    if(pictureUrls.some(u => /[А-Яа-яІіЇїЄєҐґ]/.test(u))) errors.push("picture URL містить кирилицю");
+    if(!offer.querySelector("vendor")) errors.push("немає vendor");
+    if(!offer.querySelector("name_ua")) errors.push("немає name_ua");
+    if(name.length > 255) errors.push("name_ua довше 255 символів");
+    if(name !== "—" && namesUa.has(name.toLowerCase())) errors.push("дублікат name_ua");
+    namesUa.add(name.toLowerCase());
+    if(vendor !== "—" && name !== "—" && !name.toLowerCase().includes(vendor.toLowerCase())){
+      warnings.push("vendor не входить в name_ua");
+    }
+    if(!offer.querySelector("description_ua")) errors.push("немає description_ua");
+    if(descriptionUa && (descriptionUa.length < 30 || descriptionUa.length > 60000)){
+      errors.push("description_ua має бути 30-60000 символів");
+    }
+    if(!offer.querySelector("stock_quantity") && !offer.querySelector("quantity_in_stock")){
+      errors.push("немає stock_quantity або quantity_in_stock");
+    }
+    if(priceOldRaw){
+      if(!Number.isFinite(priceOldNum)) errors.push("некоректне значення price_old");
+      else if(Number.isFinite(priceNum) && priceOldNum <= priceNum) errors.push("price_old має бути більшим за price");
+    }
+    if(params.length === 0) errors.push("немає обов'язкового param");
+
+    for(const attr of offer.attributes){
+      attrCounts[attr.name] = (attrCounts[attr.name] || 0) + 1;
+    }
+
+    for(const param of offer.querySelectorAll("param")){
+      const n = (param.getAttribute("name") || "без назви").trim();
+      paramNameCounts[n] = (paramNameCounts[n] || 0) + 1;
+      if(!n || n === "без назви") errors.push("param без name");
+      if(!(param.textContent || "").trim()) errors.push("param без значення");
+    }
+
+    products.push({
+      id, name, categoryId, price, vendor,
+      errors, warnings,
+      status: errors.length ? "invalid" : "valid",
+      available: offer.getAttribute("available") || "—",
+      pictures: pictureUrls.length,
+      pictureUrls,
+      currencyId,
+      descriptionUa,
+      description,
+      article,
+      nameRu,
+      params
+    });
+  }
+
+  return {
+    total: products.length,
+    valid: products.filter(p => p.status === "valid").length,
+    invalid: products.filter(p => p.status === "invalid").length,
+    categories: categories.size,
+    products,
+    attrCounts,
+    paramNameCounts
+  };
 }
 
-function result(t){
- document.getElementById("result").innerHTML=t
+function renderStats(s){
+  const el = document.getElementById("result");
+  el.classList.remove("hidden");
+  el.innerHTML = `
+    <div class="stat"><span>Офферів</span><strong>${s.total}</strong></div>
+    <div class="stat"><span>Валідні</span><strong class="ok">${s.valid}</strong></div>
+    <div class="stat"><span>З помилками</span><strong class="bad">${s.invalid}</strong></div>
+    <div class="stat"><span>Категорії</span><strong>${s.categories}</strong></div>
+  `;
 }
 
-function downloadXML(){
- if(!xml)return
- const a=document.createElement("a")
- a.href=URL.createObjectURL(new Blob([xml]))
- a.download="eva.xml"
- a.click()
+function renderAnalysis(s){
+  const topAttrs = Object.entries(s.attrCounts).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const topParams = Object.entries(s.paramNameCounts).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const card = document.getElementById("analysisCard");
+  card.classList.remove("hidden");
+  card.innerHTML = `
+    <h4>Аналіз структури XML</h4>
+    <p class="muted">Атрибути елемента <code>offer</code> і частота параметрів <code>param name</code>.</p>
+    <p class="muted">Примітка: вимогу "не змінювати id товарів/категорій після публікації" можна перевірити лише при порівнянні з попереднім прайсом.</p>
+    <div class="row">
+      <div style="flex:1; min-width:280px">
+        <h5>Атрибути offer</h5>
+        <table><thead><tr><th>Атрибут</th><th>Кількість</th></tr></thead><tbody>
+          ${topAttrs.length ? topAttrs.map(([k,v])=>`<tr><td>${escapeHtml(k)}</td><td>${v}</td></tr>`).join("") : `<tr><td colspan="2">Немає</td></tr>`}
+        </tbody></table>
+      </div>
+      <div style="flex:1; min-width:280px">
+        <h5>Топ параметрів</h5>
+        <table><thead><tr><th>param name</th><th>Кількість</th></tr></thead><tbody>
+          ${topParams.length ? topParams.map(([k,v])=>`<tr><td>${escapeHtml(k)}</td><td>${v}</td></tr>`).join("") : `<tr><td colspan="2">Немає</td></tr>`}
+        </tbody></table>
+      </div>
+    </div>
+  `;
 }
 
-function downloadErrors(){
- if(!errorRows.length)return alert("нема помилок")
-
- const wb=XLSX.utils.book_new()
- const ws=XLSX.utils.aoa_to_sheet([["Row","Error"],...errorRows])
- XLSX.utils.book_append_sheet(wb,ws,"Errors")
- XLSX.writeFile(wb,"errors.xlsx")
+function populateCategoryFilter(products){
+  const select = document.getElementById("categoryFilter");
+  const categories = [...new Set(products.map(p => p.categoryId).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b)));
+  select.innerHTML = `<option value="all">Всі категорії</option>` + categories.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join("");
 }
 
-async function loadXMLUrl(){
- let url=prompt("Встав URL XML")
- if(!url)return
-
- try{
-  let r=await fetch(url)
-  xmlLoaded=await r.text()
-  document.getElementById("xmlPreview").textContent=xmlLoaded.substring(0,2000)
-  result("✅ XML завантажено")
- }catch(e){
-  result("❌ не вдалося")
- }
+function applyFilters(){
+  const q = document.getElementById("qSearch").value.trim().toLowerCase();
+  const status = document.getElementById("statusFilter").value;
+  const category = document.getElementById("categoryFilter").value;
+  filteredProducts = allProducts.filter(p => {
+    const s = `${p.id} ${p.name} ${p.vendor}`.toLowerCase();
+    const searchOk = !q || s.includes(q);
+    const statusOk = status === "all" || p.status === status;
+    const categoryOk = category === "all" || p.categoryId === category;
+    return searchOk && statusOk && categoryOk;
+  });
+  currentPage = 1;
+  renderProducts();
 }
 
-async function ai(){
- let src = xmlLoaded || xml
- if(!src)return alert("нема xml")
-
- result("⏳ AI...")
-
- try{
-  const r=await fetch("https://eva-validator.ppioltd.workers.dev/",{
-   method:"POST",
-   headers:{"Content-Type":"application/json"},
-   body:JSON.stringify({xml:src})
-  })
-
-  const d=await r.json()
-  result(d.result)
-
- }catch(e){
-  result("❌ AI error")
- }
+function setViewMode(mode){
+  currentViewMode = mode;
+  document.getElementById("viewTableBtn").classList.toggle("active", mode === "table");
+  document.getElementById("viewCardsBtn").classList.toggle("active", mode === "cards");
+  document.querySelector(".small-table").classList.toggle("hidden", mode !== "table");
+  document.getElementById("productsCards").classList.toggle("hidden", mode !== "cards");
+  renderProducts();
 }
 
+function renderProducts(){
+  if(currentViewMode === "cards") return renderCards();
+  return renderTable();
+}
+
+function renderTable(){
+  const body = document.getElementById("productsBody");
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / PAGE_SIZE));
+  if(currentPage > totalPages) currentPage = totalPages;
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const pageItems = filteredProducts.slice(start, start + PAGE_SIZE);
+
+  body.innerHTML = pageItems.length ? pageItems.map((p, idx) => `
+    <tr>
+      <td>${escapeHtml(p.id)}</td>
+      <td>${escapeHtml(p.name)}</td>
+      <td>${escapeHtml(p.categoryId)}</td>
+      <td>${escapeHtml(p.price)}</td>
+      <td class="${p.status === "valid" ? "ok" : "bad"}">${p.status === "valid" ? "Валідний" : "Помилки"}</td>
+      <td><button class="btn" onclick="showDetail(${start + idx})">Деталі</button></td>
+    </tr>
+  `).join("") : `<tr><td colspan="6">Нічого не знайдено</td></tr>`;
+
+  document.getElementById("pageInfo").textContent = `${currentPage} / ${totalPages}`;
+}
+
+function renderCards(){
+  const cards = document.getElementById("productsCards");
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / PAGE_SIZE));
+  if(currentPage > totalPages) currentPage = totalPages;
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const pageItems = filteredProducts.slice(start, start + PAGE_SIZE);
+
+  cards.innerHTML = pageItems.length ? pageItems.map((p, idx) => {
+    const img = p.pictureUrls[0];
+    return `
+      <div class="p-card">
+        ${img ? `<img src="${escapeHtml(img)}" alt="${escapeHtml(p.name)}" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'ph',innerText:'Немає фото'}))">` : `<div class="ph">Немає фото</div>`}
+        <div class="p-card-body">
+          <div class="badge-status ${p.status === "valid" ? "ok" : "bad"}">${p.status === "valid" ? "Валідний" : "Помилки"}</div>
+          <div class="p-title">${escapeHtml(p.name)}</div>
+          <div class="p-meta"><strong>ID:</strong> ${escapeHtml(p.id)}</div>
+          <div class="p-meta"><strong>Бренд:</strong> ${escapeHtml(p.vendor)}</div>
+          <div class="p-meta"><strong>Ціна:</strong> ${escapeHtml(p.price)} ${escapeHtml(p.currencyId)}</div>
+          <div class="p-meta"><strong>Категорія:</strong> ${escapeHtml(p.categoryId)}</div>
+          <button class="btn" onclick="openProductModal(${start + idx})">Повна картка</button>
+        </div>
+      </div>
+    `;
+  }).join("") : `<div>Нічого не знайдено</div>`;
+
+  document.getElementById("pageInfo").textContent = `${currentPage} / ${totalPages}`;
+}
+
+function changePage(delta){
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / PAGE_SIZE));
+  currentPage = Math.min(totalPages, Math.max(1, currentPage + delta));
+  renderProducts();
+}
+
+function showDetail(filteredIndex){
+  const p = filteredProducts[filteredIndex];
+  if(!p) return;
+  const card = document.getElementById("detailCard");
+  card.classList.remove("hidden");
+  card.innerHTML = `
+    <h4>Детальний перегляд товару</h4>
+    <p><strong>ID:</strong> ${escapeHtml(p.id)}</p>
+    <p><strong>Назва:</strong> ${escapeHtml(p.name)}</p>
+    <p><strong>Бренд:</strong> ${escapeHtml(p.vendor)}</p>
+    <p><strong>Категорія:</strong> ${escapeHtml(p.categoryId)}</p>
+    <p><strong>Ціна:</strong> ${escapeHtml(p.price)}</p>
+    <p><strong>Наявність:</strong> ${escapeHtml(p.available)}</p>
+    <p><strong>Зображень:</strong> ${p.pictures}</p>
+    <p class="${p.errors.length ? "bad" : "ok"}"><strong>Помилки:</strong> ${p.errors.length ? escapeHtml(p.errors.join("; ")) : "немає"}</p>
+    <p class="warn"><strong>Попередження:</strong> ${p.warnings.length ? escapeHtml(p.warnings.join("; ")) : "немає"}</p>
+  `;
+}
+
+function openProductModal(filteredIndex){
+  const p = filteredProducts[filteredIndex];
+  if(!p) return;
+  const box = document.getElementById("productModalBox");
+  const firstImage = p.pictureUrls[0] || "";
+  const paramsRows = p.params.length
+    ? p.params.map(pm => `<tr><td>${escapeHtml(pm.name)}</td><td>${escapeHtml(pm.value)}</td></tr>`).join("")
+    : `<tr><td colspan="2">Параметри відсутні</td></tr>`;
+  const thumbs = p.pictureUrls.length
+    ? p.pictureUrls.map((u, i) => `<img src="${escapeHtml(u)}" alt="Фото ${i+1}" onclick="setMainImage('${escapeHtml(u)}')">`).join("")
+    : `<span class="muted">Фото відсутні</span>`;
+
+  box.innerHTML = `
+    <div class="modal-head">
+      <h3>Повна картка товару</h3>
+      <button class="btn" onclick="forceCloseModal()">Закрити ✕</button>
+    </div>
+    <div class="detail-grid">
+      <div>
+        ${firstImage ? `<img id="mainProductImg" class="gallery-main" src="${escapeHtml(firstImage)}" alt="${escapeHtml(p.name)}">` : `<div class="ph" style="height:260px;border-radius:10px;">Немає фото</div>`}
+        <div class="thumbs">${thumbs}</div>
+      </div>
+      <div>
+        <p><strong>Назва:</strong> ${escapeHtml(p.name)}</p>
+        ${p.nameRu ? `<p><strong>Назва (RU):</strong> ${escapeHtml(p.nameRu)}</p>` : ""}
+        <p><strong>ID:</strong> ${escapeHtml(p.id)}</p>
+        <p><strong>Артикул:</strong> ${escapeHtml(p.article || "—")}</p>
+        <p><strong>Бренд:</strong> ${escapeHtml(p.vendor)}</p>
+        <p><strong>Категорія:</strong> ${escapeHtml(p.categoryId)}</p>
+        <p><strong>Ціна:</strong> ${escapeHtml(p.price)} ${escapeHtml(p.currencyId)}</p>
+        <p><strong>Наявність:</strong> ${escapeHtml(p.available)}</p>
+        <p><strong>Статус:</strong> <span class="${p.status === "valid" ? "ok" : "bad"}">${p.status === "valid" ? "Валідний" : "Має помилки"}</span></p>
+        <p class="${p.errors.length ? "bad" : "ok"}"><strong>Помилки:</strong> ${p.errors.length ? escapeHtml(p.errors.join("; ")) : "немає"}</p>
+        <p class="warn"><strong>Попередження:</strong> ${p.warnings.length ? escapeHtml(p.warnings.join("; ")) : "немає"}</p>
+      </div>
+    </div>
+    ${p.descriptionUa ? `<h4 style="margin-top:12px">Опис (UA)</h4><p>${escapeHtml(p.descriptionUa)}</p>` : ""}
+    ${p.description ? `<h4 style="margin-top:12px">Опис (RU)</h4><p>${escapeHtml(p.description)}</p>` : ""}
+    <h4 style="margin-top:12px">Параметри</h4>
+    <table class="params-table"><thead><tr><th>Параметр</th><th>Значення</th></tr></thead><tbody>${paramsRows}</tbody></table>
+  `;
+  document.getElementById("productModal").classList.add("show");
+}
+
+function setMainImage(src){
+  const img = document.getElementById("mainProductImg");
+  if(img) img.src = src;
+}
+
+function closeProductModal(e){
+  if(e.target.id === "productModal"){
+    forceCloseModal();
+  }
+}
+
+function forceCloseModal(){
+  document.getElementById("productModal").classList.remove("show");
+}
+
+async function validate(){
+  let file=document.getElementById("xml").files[0];
+  let url=document.getElementById("url").value.trim();
+  if(!file && !url) return showPopup("Додай файл або URL",false);
+
+  showLoader();
+  try{
+    // Залишаємо серверну валідацію як і раніше
+    const fd=new FormData();
+    if(file) fd.append("file",file);
+    if(url) fd.append("url",url);
+    const serverRes = await fetch("/validate",{method:"POST",body:fd});
+    const serverData = await serverRes.json();
+    if(serverData.error) throw new Error(serverData.error);
+
+    // Плюс локальний аналіз XML для таблиці/деталей/структури
+    const xmlText = await loadXmlTextFromSource(file, url);
+    const analyzed = analyzeXml(xmlText);
+    renderStats(analyzed);
+    renderAnalysis(analyzed);
+
+    allProducts = analyzed.products;
+    filteredProducts = [...allProducts];
+    populateCategoryFilter(allProducts);
+    document.getElementById("filtersCard").classList.remove("hidden");
+    setViewMode(currentViewMode);
+    document.getElementById("detailCard").classList.add("hidden");
+
+    showPopup("Готово");
+  }catch(err){
+    showPopup(err.message || "Помилка валідації", false);
+  }finally{
+    hideLoader();
+  }
+}
 </script>
 </body>
 </html>
