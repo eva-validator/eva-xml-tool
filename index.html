@@ -2,120 +2,210 @@
 <html lang="uk">
 <head>
 <meta charset="UTF-8">
-<title>EVA PRO MAX</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EVA MAX PRO</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <style>
-body{background:#0a0f14;color:#fff;font-family:sans-serif;padding:20px}
+body{background:#060A0E;color:#fff;font-family:sans-serif;padding:20px}
 h1{color:#FF6B00}
-button{padding:12px;margin:5px;border:none;border-radius:8px;cursor:pointer;background:#FF6B00;color:#fff}
-.box{margin-top:15px;padding:15px;border:1px solid #333;border-radius:10px}
-textarea{width:100%;height:200px;background:#111;color:#0f0;padding:10px}
-#aiBox{display:none;background:#062}
+.box{border:1px solid #333;padding:15px;margin-top:15px;border-radius:10px}
+button{padding:12px;border:none;border-radius:10px;margin:5px;cursor:pointer;background:#FF6B00;color:#fff}
+#drop{border:2px dashed #FF6B00;padding:30px;text-align:center;margin-top:10px}
+#progress{height:10px;background:#222;margin-top:10px;border-radius:10px;overflow:hidden}
+#bar{height:100%;width:0;background:#1DB954}
+pre{max-height:250px;overflow:auto;background:#000;padding:10px}
 </style>
 </head>
 
 <body>
 
-<h1>🔥 EVA PRO MAX</h1>
+<h1>🔥 EVA MAX PRO</h1>
 
-<input type="file" id="excel">
-
-<br>
-
-<button onclick="convert()">Excel → XML</button>
-<button onclick="validate()">Валідація</button>
-<button onclick="runAI()">🤖 AI</button>
-
-<div id="stats" class="box"></div>
-<textarea id="xml"></textarea>
-
-<div id="aiBox" class="box">
-  <b>🤖 AI:</b>
-  <pre id="ai"></pre>
+<div id="drop" ondrop="drop(event)" ondragover="event.preventDefault()">
+<input type="file" id="file">
 </div>
+
+<div class="box">
+<button onclick="convert()">🔄 Excel → XML</button>
+<button onclick="validate()">✅ Validate</button>
+<button onclick="downloadXML()">⬇️ XML</button>
+<button onclick="downloadErrors()">📥 Errors XLSX</button>
+<button onclick="loadXMLUrl()">🌐 Load XML URL</button>
+<button onclick="ai()">🤖 AI</button>
+</div>
+
+<div id="progress"><div id="bar"></div></div>
+
+<div class="box" id="stats"></div>
+<div class="box"><pre id="xmlPreview"></pre></div>
+<div class="box" id="result"></div>
 
 <script>
 
-let data=[], xml='';
+let data=null
+let xml=""
+let errorRows=[]
+let xmlLoaded=""
 
-// LOAD
-document.getElementById('excel').onchange=e=>{
-  const f=e.target.files[0];
-  const r=new FileReader();
-  r.onload=x=>{
-    const wb=XLSX.read(x.target.result,{type:'array'});
-    const ws=wb.Sheets[wb.SheetNames[0]];
-    data=XLSX.utils.sheet_to_json(ws,{defval:''});
-    stats();
-  };
-  r.readAsArrayBuffer(f);
-};
-
-// STATS
-function stats(){
-  let brands=new Set();
-  data.forEach(r=>brands.add(r['Бренд']));
-  document.getElementById('stats').innerHTML=
-    `📦 ${data.length} товарів<br>🏷 ${brands.size} брендів`;
+document.getElementById("file").onchange=e=>{
+ loadFile(e.target.files[0])
 }
 
-// CONVERT
+function drop(e){
+ e.preventDefault()
+ loadFile(e.dataTransfer.files[0])
+}
+
+function loadFile(file){
+ const reader=new FileReader()
+ reader.onload=e=>{
+  const wb=XLSX.read(e.target.result,{type:"array"})
+  const ws=wb.Sheets[wb.SheetNames[0]]
+  data=XLSX.utils.sheet_to_json(ws,{defval:""})
+  stats("📊 Завантажено: "+data.length)
+ }
+ reader.readAsArrayBuffer(file)
+}
+
+function progress(p){
+ document.getElementById("bar").style.width=p+"%"
+}
+
+function stats(t){
+ document.getElementById("stats").innerHTML=t
+}
+
 function convert(){
-  let out=`<yml_catalog><shop><offers>`;
-  let ok=0, skip=0;
+ if(!data)return alert("нема excel")
 
-  data.forEach(r=>{
-    if(!r['Offer ID']||!r['Цена']){skip++;return;}
-    out+=`
-<offer id="${r['Offer ID']}">
-<price>${r['Цена']}</price>
-<name_ua>${r['Название (украинский)']}</name_ua>
-<vendor>${r['Бренд']||''}</vendor>
-<categoryId>${r['ID Категории']||1}</categoryId>
-<picture>${(r['Изображения']||'').split(',')[0]||''}</picture>
-<description_ua>${r['Описание (украинский)']||''}</description_ua>
-</offer>`;
-    ok++;
-  });
+ let offers=""
+ let brands=new Set()
+ let cats=new Set()
+ let ids=new Set()
+ errorRows=[]
 
-  out+=`</offers></shop></yml_catalog>`;
-  xml=out;
-  document.getElementById('xml').value=xml;
+ data.forEach((r,i)=>{
+  progress(i/data.length*100)
 
-  document.getElementById('stats').innerHTML+=
-    `<br>✔ ${ok} | ❌ ${skip}`;
+  let err=[]
+
+  if(!r["Offer ID"]) err.push("немає Offer ID")
+  if(ids.has(r["Offer ID"])) err.push("дублікат ID")
+  if(!r["Цена"]) err.push("немає ціни")
+  if(!r["Название (украинский)"]) err.push("немає назви")
+  if(!r["Бренд"]) err.push("немає бренд")
+  if(!r["Категория"]) err.push("немає категорія")
+  if(!r["Описание (украинский)"]) err.push("немає опис")
+  if(!r["Изображения"]) err.push("немає фото")
+
+  if(err.length){
+    errorRows.push([i+1, err.join(", ")])
+    return
+  }
+
+  ids.add(r["Offer ID"])
+  brands.add(r["Бренд"])
+  cats.add(r["Категория"])
+
+  let pics=r["Изображения"].split(",").slice(0,15)
+    .map(p=>`<picture>${p.trim()}</picture>`).join("")
+
+  offers+=`
+<offer id="${r["Offer ID"]}" available="true">
+<price>${r["Цена"]}</price>
+<currencyId>UAH</currencyId>
+<categoryId>${r["ID Категории"]||1}</categoryId>
+${pics}
+<vendor>${r["Бренд"]}</vendor>
+<name_ua>${r["Название (украинский)"]}</name_ua>
+<description_ua>${r["Описание (украинский)"]}</description_ua>
+</offer>`
+ })
+
+ xml=`<offers>${offers}</offers>`
+
+ document.getElementById("xmlPreview").textContent=xml.substring(0,3000)
+
+ stats(
+ "📦 Товари: "+data.length+
+ "<br>🏷 Бренди: "+brands.size+
+ "<br>📂 Категорії: "+cats.size+
+ "<br>❌ Помилки: "+errorRows.length
+ )
 }
 
-// VALIDATE
 function validate(){
-  let e=[];
-  if(!xml.includes('<price>')) e.push('price');
-  if(!xml.includes('<name_ua>')) e.push('name');
-  if(!xml.includes('<picture>')) e.push('image');
+ let src = xmlLoaded || xml
+ if(!src)return alert("нема xml")
 
-  alert(e.length?'❌ '+e.join(', '):'✅ OK');
+ let err=0
+
+ if(!src.includes("<offer")) err++
+ if(!src.includes("<price>")) err++
+ if(!src.includes("<vendor>")) err++
+ if(!src.includes("<name_ua>")) err++
+
+ result(err? "❌ Помилки: "+err : "✅ XML валідний")
 }
 
-// AI
-async function runAI(){
-  if(!xml)return alert('нема XML');
+function result(t){
+ document.getElementById("result").innerHTML=t
+}
 
-  aiBox.style.display='block';
-  ai.innerText='⏳...';
+function downloadXML(){
+ if(!xml)return
+ const a=document.createElement("a")
+ a.href=URL.createObjectURL(new Blob([xml]))
+ a.download="eva.xml"
+ a.click()
+}
 
-  const r=await fetch('https://eva-validator.ppioltd.workers.dev/',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({xml})
-  });
+function downloadErrors(){
+ if(!errorRows.length)return alert("нема помилок")
 
-  const d=await r.json();
-  ai.innerText=d.result;
+ const wb=XLSX.utils.book_new()
+ const ws=XLSX.utils.aoa_to_sheet([["Row","Error"],...errorRows])
+ XLSX.utils.book_append_sheet(wb,ws,"Errors")
+ XLSX.writeFile(wb,"errors.xlsx")
+}
+
+async function loadXMLUrl(){
+ let url=prompt("Встав URL XML")
+ if(!url)return
+
+ try{
+  let r=await fetch(url)
+  xmlLoaded=await r.text()
+  document.getElementById("xmlPreview").textContent=xmlLoaded.substring(0,2000)
+  result("✅ XML завантажено")
+ }catch(e){
+  result("❌ не вдалося")
+ }
+}
+
+async function ai(){
+ let src = xmlLoaded || xml
+ if(!src)return alert("нема xml")
+
+ result("⏳ AI...")
+
+ try{
+  const r=await fetch("https://eva-validator.ppioltd.workers.dev/",{
+   method:"POST",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({xml:src})
+  })
+
+  const d=await r.json()
+  result(d.result)
+
+ }catch(e){
+  result("❌ AI error")
+ }
 }
 
 </script>
-
 </body>
 </html>
