@@ -94,10 +94,8 @@ function detectCharset(contentType, sampleText){
   const ct=(contentType||'').toLowerCase()
   const ctMatch=ct.match(/charset\s*=\s*["']?\s*([^;"'\s]+)/i)
   if(ctMatch&&ctMatch[1]) return ctMatch[1].toLowerCase()
-
   const xmlMatch=(sampleText||'').match(/<\?xml[^>]*encoding\s*=\s*["']([^"']+)["']/i)
   if(xmlMatch&&xmlMatch[1]) return xmlMatch[1].toLowerCase()
-
   return 'utf-8'
 }
 
@@ -119,9 +117,8 @@ function normalizeCharset(charset){
 
 function decodeXmlBuffer(arrayBuffer, contentType){
   const bytes=new Uint8Array(arrayBuffer)
-  const asciiSample=new TextDecoder('ascii').decode(bytes.slice(0, 4096))
+  const asciiSample=new TextDecoder('ascii').decode(bytes.slice(0,4096))
   let charset=normalizeCharset(detectCharset(contentType, asciiSample))
-
   let text=''
   try{
     text=new TextDecoder(charset).decode(bytes)
@@ -129,7 +126,6 @@ function decodeXmlBuffer(arrayBuffer, contentType){
     charset='utf-8'
     text=new TextDecoder('utf-8').decode(bytes)
   }
-
   return { text, charset }
 }
 
@@ -143,7 +139,7 @@ function pf(file,t){
     const r=new FileReader()
     r.onload=e=>{const wb=XLSX.read(e.target.result,{type:'array'});const ws=wb.Sheets[wb.SheetNames[0]];eData=XLSX.utils.sheet_to_json(ws,{defval:''})}
     r.readAsArrayBuffer(file)
-  } else {
+  }else{
     document.getElementById('vfn').textContent=file.name
     document.getElementById('vfs').textContent=fb(file.size)
     document.getElementById('vfi').classList.add('show')
@@ -196,16 +192,15 @@ async function loadUrl(){
       throw new Error(errText||`HTTP ${r.status}`)
     }
 
-    const contentLength=Number(r.headers.get('x-source-content-length')||r.headers.get('content-length')||0)
+    const contentType=r.headers.get('content-type')||'application/xml'
+    const contentLength=Number(r.headers.get('content-length')||0)
     if(contentLength&&contentLength>MAX_URL_XML){
       st.style.color='var(--err)'
       st.textContent='❌ XML через URL перевищує 300 МБ.'
       return
     }
 
-    const contentType=r.headers.get('content-type')||'application/xml'
     const arrayBuffer=await r.arrayBuffer()
-
     if(arrayBuffer.byteLength>MAX_URL_XML){
       st.style.color='var(--err)'
       st.textContent='❌ XML через URL перевищує 300 МБ.'
@@ -230,37 +225,8 @@ async function loadUrl(){
   }
 }
 
-function buildXml(data){
-  const now=new Date().toISOString().slice(0,16).replace('T',' ')
-  const cats={},offers=[],errors=[]
-  data.forEach((row,i)=>{
-    const oid=cv(row['Offer ID']),nua=cv(row['Название (украинский)']),price=cv(row['Цена']),cid=cv(row['ID Категории']),vendor=cv(row['Бренд']),dua=cv(row['Описание (украинский)']),imgs=cv(row['Изображения'])
-    if(!oid||!nua||!price||!cid||!vendor||!dua||!imgs){errors.push({row:i+2,id:oid||'—',name:nua||'—',errors:'неповні обов\'язкові поля'});return}
-    if(!cats[cid])cats[cid]=cv(row['Категория'])
-    const pics=imgs.split(',').slice(0,15).map(u=>u.trim()).filter(Boolean).map(u=>`    <picture><![CDATA[${u}]]></picture>`).join('\n')
-    let o=`  <offer id="${esc(oid)}" available="true">\n    <price>${esc(price)}</price>\n    <stock_quantity>${esc(cv(row['Количество'])||'0')}</stock_quantity>\n    <currencyId>${esc(cv(row['Валюта'])||'UAH')}</currencyId>\n    <categoryId>${esc(cid)}</categoryId>\n${pics}\n    <vendor>${esc(vendor)}</vendor>\n    <name_ua><![CDATA[${nua}]]></name_ua>\n    <description_ua><![CDATA[${dua}]]></description_ua>\n`
-    for(let k=0;k<=24;k++){const s=k?'.'+k:'';const ch=cv(row['Характеристика'+s]),va=cv(row['Значение'+s]);if(ch&&va)o+=`    <param name="${esc(ch)}">${esc(va)}</param>\n`}
-    o+='  </offer>'
-    offers.push(o)
-  })
-  const cxml=Object.entries(cats).map(([id,n])=>`    <category id="${esc(id)}">${esc(n)}</category>`).join('\n')
-  return{xml:`<?xml version="1.0" encoding="UTF-8"?>\n<yml_catalog date="${now}">\n  <shop>\n    <name>EVA</name>\n    <company>EVA</company>\n    <url>https://eva.ua/</url>\n    <currencies>\n      <currency id="UAH" rate="1"/>\n      <currency id="USD" rate="44"/>\n      <currency id="EUR" rate="50"/>\n    </currencies>\n    <categories>\n${cxml}\n    </categories>\n    <offers>\n${offers.join('\n')}\n    </offers>\n  </shop>\n</yml_catalog>`,errors}
-}
-
-function convertExcel(){
-  if(!eData){alert('Завантажте Excel файл');return}
-  animateProg('eProg','eRing','ePl',Math.max(700,eData.length*3),'Конвертація...',()=>{
-    const r=buildXml(eData)
-    xmlRes=r.xml
-    eErrRows=r.errors
-    document.getElementById('eStep3').style.display='block'
-    const cnt=(r.xml.match(/<offer /g)||[]).length
-    document.getElementById('eMsg').innerHTML=cnt?`<div class="rok">🎉 Готово! Сформовано ${cnt} товарів. Пропущено: ${r.errors.length}.</div>`:`<div class="rfail">⛔ Не сформовано жодного товару.</div>`
-    document.getElementById('eDlRow').style.display=cnt?'grid':'none'
-    document.getElementById('ePrev').textContent=r.xml.substring(0,3000)+(r.xml.length>3000?'\n...':'')
-  })
-}
-
+function buildXml(data){const now=new Date().toISOString().slice(0,16).replace('T',' '),cats={},offers=[],errors=[];data.forEach((row,i)=>{const oid=cv(row['Offer ID']),nua=cv(row['Название (украинский)']),price=cv(row['Цена']),cid=cv(row['ID Категории']),vendor=cv(row['Бренд']),dua=cv(row['Описание (украинский)']),imgs=cv(row['Изображения']);if(!oid||!nua||!price||!cid||!vendor||!dua||!imgs){errors.push({row:i+2,id:oid||'—',name:nua||'—',errors:'неповні обов\'язкові поля'});return}if(!cats[cid])cats[cid]=cv(row['Категория']);const pics=imgs.split(',').slice(0,15).map(u=>u.trim()).filter(Boolean).map(u=>`    <picture><![CDATA[${u}]]></picture>`).join('\n');let o=`  <offer id="${esc(oid)}" available="true">\n    <price>${esc(price)}</price>\n    <stock_quantity>${esc(cv(row['Количество'])||'0')}</stock_quantity>\n    <currencyId>${esc(cv(row['Валюта'])||'UAH')}</currencyId>\n    <categoryId>${esc(cid)}</categoryId>\n${pics}\n    <vendor>${esc(vendor)}</vendor>\n    <name_ua><![CDATA[${nua}]]></name_ua>\n    <description_ua><![CDATA[${dua}]]></description_ua>\n`;for(let k=0;k<=24;k++){const s=k?'.'+k:'';const ch=cv(row['Характеристика'+s]),va=cv(row['Значение'+s]);if(ch&&va)o+=`    <param name="${esc(ch)}">${esc(va)}</param>\n`}o+='  </offer>';offers.push(o)});const cxml=Object.entries(cats).map(([id,n])=>`    <category id="${esc(id)}">${esc(n)}</category>`).join('\n');return{xml:`<?xml version="1.0" encoding="UTF-8"?>\n<yml_catalog date="${now}">\n  <shop>\n    <name>EVA</name>\n    <company>EVA</company>\n    <url>https://eva.ua/</url>\n    <currencies>\n      <currency id="UAH" rate="1"/>\n      <currency id="USD" rate="44"/>\n      <currency id="EUR" rate="50"/>\n    </currencies>\n    <categories>\n${cxml}\n    </categories>\n    <offers>\n${offers.join('\n')}\n    </offers>\n  </shop>\n</yml_catalog>`,errors}}
+function convertExcel(){if(!eData){alert('Завантажте Excel файл');return}animateProg('eProg','eRing','ePl',Math.max(700,eData.length*3),'Конвертація...',()=>{const r=buildXml(eData);xmlRes=r.xml;eErrRows=r.errors;document.getElementById('eStep3').style.display='block';const cnt=(r.xml.match(/<offer /g)||[]).length;document.getElementById('eMsg').innerHTML=cnt?`<div class="rok">🎉 Готово! Сформовано ${cnt} товарів. Пропущено: ${r.errors.length}.</div>`:`<div class="rfail">⛔ Не сформовано жодного товару.</div>`;document.getElementById('eDlRow').style.display=cnt?'grid':'none';document.getElementById('ePrev').textContent=r.xml.substring(0,3000)+(r.xml.length>3000?'\n...':'')})}
 function doVal(c){
   if(/[\x00-\x08\x0B\x0C\x0E-\x1F]/.test(c)){
     return{errCounts:{'Недруковані ASCII символи в XML':1},warnCounts:{},products:[],attrCounts:{},paramCounts:{},total:0,valid:0,invalid:0,cats:0,errCount:1,warnCount:0}
@@ -317,35 +283,7 @@ function doVal(c){
   })
   return{errCounts,warnCounts,products,attrCounts,paramCounts,total,valid,invalid,cats,errCount,warnCount}
 }
-
-function validateXml(){
-  if(!xmlCnt){alert('Завантажте XML');return}
-  animateProg('vProg','vRing','vPl',1200,'Перевірка EVA...',()=>{
-    const r=doVal(xmlCnt)
-    document.getElementById('vT').textContent=r.total
-    document.getElementById('vV').textContent=r.valid
-    document.getElementById('vI').textContent=r.invalid
-    document.getElementById('vC').textContent=r.cats
-    document.getElementById('vStep3').style.display='block'
-    document.getElementById('vMsg').innerHTML=(!r.errCount&&!r.warnCount)?'<div class="rok">🎉 XML повністю валідний!</div>':''
-    document.getElementById('errSumWrap').style.display=r.errCount?'block':'none'
-    document.getElementById('warnSumWrap').style.display=r.warnCount?'block':'none'
-    document.getElementById('errSum').innerHTML=Object.entries(r.errCounts).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('')
-    document.getElementById('warnSum').innerHTML=Object.entries(r.warnCounts).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('')
-    eErrRows=r.products.filter(x=>x.status==='invalid').map(x=>({row:'—',id:x.id,name:x.name,errors:x.errors.join('; ')}))
-    prodRows=r.products
-    prodFiltered=[...prodRows]
-    fillCats()
-    pPage=1
-    renderProducts()
-    document.getElementById('vProducts').style.display='block'
-    attrMap=r.attrCounts
-    paramMap=r.paramCounts
-    renderStructure()
-    document.getElementById('vStruct').style.display='block'
-  })
-}
-
+function validateXml(){if(!xmlCnt){alert('Завантажте XML');return}animateProg('vProg','vRing','vPl',1200,'Перевірка EVA...',()=>{const r=doVal(xmlCnt);document.getElementById('vT').textContent=r.total;document.getElementById('vV').textContent=r.valid;document.getElementById('vI').textContent=r.invalid;document.getElementById('vC').textContent=r.cats;document.getElementById('vStep3').style.display='block';document.getElementById('vMsg').innerHTML=(!r.errCount&&!r.warnCount)?'<div class="rok">🎉 XML повністю валідний!</div>':'';document.getElementById('errSumWrap').style.display=r.errCount?'block':'none';document.getElementById('warnSumWrap').style.display=r.warnCount?'block':'none';document.getElementById('errSum').innerHTML=Object.entries(r.errCounts).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('');document.getElementById('warnSum').innerHTML=Object.entries(r.warnCounts).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('');eErrRows=r.products.filter(x=>x.status==='invalid').map(x=>({row:'—',id:x.id,name:x.name,errors:x.errors.join('; ')}));prodRows=r.products;prodFiltered=[...prodRows];fillCats();pPage=1;renderProducts();document.getElementById('vProducts').style.display='block';attrMap=r.attrCounts;paramMap=r.paramCounts;renderStructure();document.getElementById('vStruct').style.display='block'})}
 function fillCats(){const s=document.getElementById('pCat');const cats=[...new Set(prodRows.map(r=>r.categoryId))].sort();s.innerHTML='<option value="all">Всі категорії</option>'+cats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('')}
 function applyProductFilters(){const q=document.getElementById('pSearch').value.trim().toLowerCase(),st=document.getElementById('pStatus').value,cat=document.getElementById('pCat').value;prodFiltered=prodRows.filter(r=>((r.id+' '+r.name+' '+r.vendor).toLowerCase().includes(q))&&(st==='all'||r.status===st)&&(cat==='all'||r.categoryId===cat));pPage=1;renderProducts()}
 function setProductView(v){pView=v;document.getElementById('vTableBtn').classList.toggle('act',v==='table');document.getElementById('vCardBtn').classList.toggle('act',v==='cards');document.getElementById('pTableWrap').style.display=v==='table'?'block':'none';document.getElementById('pCards').style.display=v==='cards'?'grid':'none';renderProducts()}
@@ -355,8 +293,7 @@ document.getElementById('pBody').innerHTML=arr.map((r,i)=>`<tr><td>${esc(r.id)}<
 document.getElementById('pCards').innerHTML=arr.map((r,i)=>`<div class="pcard">${r.pictures[0]?`<img class="pimg" src="${esc(r.pictures[0])}" alt="">`:`<div class="pimg" style="display:flex;align-items:center;justify-content:center;color:var(--muted)">Немає фото</div>`}<div class="pbody"><div class="pt">${esc(r.name)}</div><div class="pm">ID: ${esc(r.id)}</div><div class="pm">Бренд: ${esc(r.vendor)}</div><div class="pm">Ціна: ${esc(r.price)} ${esc(r.currency)}</div><div class="pm">Категорія: ${esc(r.categoryId)}</div><button class="tprev" onclick="openCard(${st+i})">Повна картка</button></div></div>`).join('')||'<div class="pm">Нічого не знайдено</div>'}
 function openCard(i){const p=prodFiltered[i];if(!p)return;const thumbs=p.pictures.map(u=>`<img style="width:62px;height:62px;object-fit:cover;border:1px solid var(--border);border-radius:7px;cursor:pointer" src="${esc(u)}" onclick="setMain('${esc(u)}')">`).join('');const params=p.params.map(pm=>`<tr><td>${esc(pm.name||'—')}</td><td>${esc(pm.value||'—')}</td></tr>`).join('')||'<tr><td colspan="2">Параметри відсутні</td></tr>';document.getElementById('mbox').innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center"><b>${esc(p.name)}</b><button class="tprev" onclick="forceClose()">Закрити ✕</button></div><div style="display:grid;grid-template-columns:1.1fr .9fr;gap:12px;margin-top:10px">${p.pictures[0]?`<div><img id="mainPic" style="width:100%;max-height:360px;object-fit:contain;border:1px solid var(--border);border-radius:10px" src="${esc(p.pictures[0])}"><div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:8px">${thumbs}</div></div>`:`<div style="height:260px;display:flex;align-items:center;justify-content:center;color:var(--muted);border:1px solid var(--border);border-radius:10px">Немає фото</div>`}<div><div class="pm">ID: ${esc(p.id)}</div><div class="pm">Артикул: ${esc(p.article)}</div><div class="pm">Бренд: ${esc(p.vendor)}</div><div class="pm">Категорія: ${esc(p.categoryId)}</div><div class="pm">Ціна: ${esc(p.price)} ${esc(p.currency)}</div><div class="pm">Наявність: ${esc(p.available)}</div><div class="pm">Помилки: ${esc(p.errors.join('; ')||'немає')}</div><div class="pm">Попередження: ${esc(p.warnings.join('; ')||'немає')}</div></div></div><div class="pm" style="margin-top:10px">${esc(p.descriptionUa||'—')}</div><table class="prod-table"><thead><tr><th>Параметр</th><th>Значення</th></tr></thead><tbody>${params}</tbody></table>`;document.getElementById('pmodal').classList.add('show')}
 function setMain(src){const i=document.getElementById('mainPic');if(i)i.src=src}
-function closeModal(e){if(e.target.id==='pmodal')forceClose()}
-function forceClose(){document.getElementById('pmodal').classList.remove('show')}
+function closeModal(e){if(e.target.id==='pmodal')forceClose()}function forceClose(){document.getElementById('pmodal').classList.remove('show')}
 function renderStructure(){document.getElementById('attrBody').innerHTML=Object.entries(attrMap).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('')||'<tr><td colspan="2">Немає даних</td></tr>';document.getElementById('paramBody').innerHTML=Object.entries(paramMap).sort((a,b)=>b[1]-a[1]).slice(0,50).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('')||'<tr><td colspan="2">Немає даних</td></tr>'}
 function dlXml(t){const c=t==='excel'?xmlRes:xmlCnt;if(!c)return;const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:'application/xml'}));a.download=t==='excel'?'eva_pricelist.xml':'eva_validated.xml';a.click()}
 function copyLink(){if(!xmlRes)return;navigator.clipboard.writeText('data:application/xml;base64,'+btoa(unescape(encodeURIComponent(xmlRes)))).then(()=>alert('✅ Посилання скопійовано')).catch(()=>dlXml('excel'))}
