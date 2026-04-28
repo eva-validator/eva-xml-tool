@@ -79,49 +79,149 @@ const WORKER_PROXY_URL='https://eva-validator.ppioltd.workers.dev/'
 const esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
 const cv=v=>(v===null||v===undefined||v!==v)?'':String(v).trim()
 const fb=b=>b<1048576?(b/1024).toFixed(1)+' КБ':(b/1048576).toFixed(1)+' МБ'
+
 function switchTab(n){document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active','g'));document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));const btn=document.querySelector(`.tab-btn:nth-child(${n==='excel'?1:2})`);btn.classList.add('active');if(n==='valid')btn.classList.add('g');document.getElementById('panel-'+n).classList.add('active')}
 function ss(src){['file','url'].forEach(s=>{document.getElementById('s'+s.charAt(0).toUpperCase()+s.slice(1)).classList.toggle('active',s===src);document.getElementById('sp-'+s).classList.toggle('active',s===src)})}
-function dov(e){e.preventDefault();e.currentTarget.classList.add('over')}function dol(e,id){document.getElementById(id).classList.remove('over')}
+function dov(e){e.preventDefault();e.currentTarget.classList.add('over')}
+function dol(e,id){document.getElementById(id).classList.remove('over')}
 function ddr(e,t){e.preventDefault();e.currentTarget.classList.remove('over');const f=e.dataTransfer.files[0];if(f)pf(f,t)}
-function hf(inp,t){if(inp.files[0])pf(inp.files[0],t)}function tp(id){document.getElementById(id).classList.toggle('show')}
+function hf(inp,t){if(inp.files[0])pf(inp.files[0],t)}
+function tp(id){document.getElementById(id).classList.toggle('show')}
 function setProg(id,val){document.getElementById(id).style.setProperty('--p',`${val}%`)}
 function animateProg(wrap,ring,label,ms,text,done){const w=document.getElementById(wrap);w.classList.add('show');document.getElementById(label).textContent=text;let s=null;(function step(ts){if(!s)s=ts;const p=Math.min(100,((ts-s)/ms)*100);setProg(ring,p);if(p<100)requestAnimationFrame(step);else{w.classList.remove('show');done&&done()}})(performance.now())}
-function pf(file,t){if(file.size>250*1024*1024){alert('Файл перевищує 250 МБ!');return}
-if(t==='excel'){document.getElementById('efn').textContent=file.name;document.getElementById('efs').textContent=fb(file.size);document.getElementById('efi').classList.add('show');document.getElementById('eStep2').style.display='block';const r=new FileReader();r.onload=e=>{const wb=XLSX.read(e.target.result,{type:'array'});const ws=wb.Sheets[wb.SheetNames[0]];eData=XLSX.utils.sheet_to_json(ws,{defval:''})};r.readAsArrayBuffer(file)}
-else{document.getElementById('vfn').textContent=file.name;document.getElementById('vfs').textContent=fb(file.size);document.getElementById('vfi').classList.add('show');const r=new FileReader();r.onload=e=>{xmlCnt=e.target.result;document.getElementById('vStep2').style.display='block';document.getElementById('vPrev').textContent=xmlCnt.substring(0,2000)+(xmlCnt.length>2000?'\n...':'')};r.readAsText(file,'UTF-8')}}
-function rmf(t){if(t==='excel'){eData=null;xmlRes=null;document.getElementById('efi').classList.remove('show');document.getElementById('eStep2').style.display='none';document.getElementById('eStep3').style.display='none'}else{xmlCnt=null;document.getElementById('vfi').classList.remove('show');document.getElementById('vStep2').style.display='none';document.getElementById('vStep3').style.display='none';document.getElementById('vProducts').style.display='none';document.getElementById('vStruct').style.display='none'}}
-function urlTyped(){document.getElementById('urlClr').classList.toggle('show',document.getElementById('urlIn').value.length>0)}function clearUrl(){document.getElementById('urlIn').value='';document.getElementById('urlClr').classList.remove('show');document.getElementById('urlSt').textContent='';xmlCnt=null}
+
+function detectCharset(contentType, sampleText){
+  const ct=(contentType||'').toLowerCase()
+  const ctMatch=ct.match(/charset\s*=\s*["']?\s*([^;"'\s]+)/i)
+  if(ctMatch&&ctMatch[1]) return ctMatch[1].toLowerCase()
+
+  const xmlMatch=(sampleText||'').match(/<\?xml[^>]*encoding\s*=\s*["']([^"']+)["']/i)
+  if(xmlMatch&&xmlMatch[1]) return xmlMatch[1].toLowerCase()
+
+  return 'utf-8'
+}
+
+function normalizeCharset(charset){
+  const map={
+    'utf8':'utf-8',
+    'utf-8':'utf-8',
+    'cp1251':'windows-1251',
+    'windows-1251':'windows-1251',
+    'win-1251':'windows-1251',
+    '1251':'windows-1251',
+    'cp1252':'windows-1252',
+    'windows-1252':'windows-1252',
+    'iso-8859-1':'iso-8859-1',
+    'koi8-r':'koi8-r'
+  }
+  return map[(charset||'').toLowerCase()]||charset||'utf-8'
+}
+
+function decodeXmlBuffer(arrayBuffer, contentType){
+  const bytes=new Uint8Array(arrayBuffer)
+  const asciiSample=new TextDecoder('ascii').decode(bytes.slice(0, 4096))
+  let charset=normalizeCharset(detectCharset(contentType, asciiSample))
+
+  let text=''
+  try{
+    text=new TextDecoder(charset).decode(bytes)
+  }catch{
+    charset='utf-8'
+    text=new TextDecoder('utf-8').decode(bytes)
+  }
+
+  return { text, charset }
+}
+
+function pf(file,t){
+  if(file.size>250*1024*1024){alert('Файл перевищує 250 МБ!');return}
+  if(t==='excel'){
+    document.getElementById('efn').textContent=file.name
+    document.getElementById('efs').textContent=fb(file.size)
+    document.getElementById('efi').classList.add('show')
+    document.getElementById('eStep2').style.display='block'
+    const r=new FileReader()
+    r.onload=e=>{const wb=XLSX.read(e.target.result,{type:'array'});const ws=wb.Sheets[wb.SheetNames[0]];eData=XLSX.utils.sheet_to_json(ws,{defval:''})}
+    r.readAsArrayBuffer(file)
+  } else {
+    document.getElementById('vfn').textContent=file.name
+    document.getElementById('vfs').textContent=fb(file.size)
+    document.getElementById('vfi').classList.add('show')
+    const r=new FileReader()
+    r.onload=e=>{
+      const { text } = decodeXmlBuffer(e.target.result, file.type || 'application/xml')
+      xmlCnt=text
+      document.getElementById('vStep2').style.display='block'
+      document.getElementById('vPrev').textContent=xmlCnt.substring(0,2000)+(xmlCnt.length>2000?'\n...':'')
+    }
+    r.readAsArrayBuffer(file)
+  }
+}
+
+function rmf(t){
+  if(t==='excel'){
+    eData=null
+    xmlRes=null
+    document.getElementById('efi').classList.remove('show')
+    document.getElementById('eStep2').style.display='none'
+    document.getElementById('eStep3').style.display='none'
+  }else{
+    xmlCnt=null
+    document.getElementById('vfi').classList.remove('show')
+    document.getElementById('vStep2').style.display='none'
+    document.getElementById('vStep3').style.display='none'
+    document.getElementById('vProducts').style.display='none'
+    document.getElementById('vStruct').style.display='none'
+  }
+}
+
+function urlTyped(){document.getElementById('urlClr').classList.toggle('show',document.getElementById('urlIn').value.length>0)}
+function clearUrl(){document.getElementById('urlIn').value='';document.getElementById('urlClr').classList.remove('show');document.getElementById('urlSt').textContent='';xmlCnt=null}
 
 async function loadUrl(){
   let url=document.getElementById('urlIn').value.trim()
   if(!url){alert('Вставте URL!');return}
   if(!url.startsWith('http'))url='https://'+url
+
   const st=document.getElementById('urlSt')
   st.style.color='var(--muted)'
   st.textContent='⏳ Завантажую через Cloudflare Worker...'
+
   try{
     const endpoint=`${WORKER_PROXY_URL}?url=${encodeURIComponent(url)}`
     const r=await fetch(endpoint,{method:'GET'})
+
     if(!r.ok){
       const errText=await r.text()
       throw new Error(errText||`HTTP ${r.status}`)
     }
-    const ab=await r.arrayBuffer()
-    if(ab.byteLength>MAX_URL_XML){
+
+    const contentLength=Number(r.headers.get('x-source-content-length')||r.headers.get('content-length')||0)
+    if(contentLength&&contentLength>MAX_URL_XML){
       st.style.color='var(--err)'
       st.textContent='❌ XML через URL перевищує 300 МБ.'
       return
     }
-    // Спочатку пробуємо UTF-8, якщо є битий символ — перекодовуємо з windows-1251
-    let t=new TextDecoder('utf-8').decode(ab)
-    if(t.includes('\uFFFD')){
-      t=new TextDecoder('windows-1251').decode(ab)
+
+    const contentType=r.headers.get('content-type')||'application/xml'
+    const arrayBuffer=await r.arrayBuffer()
+
+    if(arrayBuffer.byteLength>MAX_URL_XML){
+      st.style.color='var(--err)'
+      st.textContent='❌ XML через URL перевищує 300 МБ.'
+      return
     }
-    const trimmed=t.replace(/^\uFEFF/,'').trimStart()
-    if(!trimmed.startsWith('<')){throw new Error('Отримано не XML')}
-    xmlCnt=t
+
+    const { text, charset } = decodeXmlBuffer(arrayBuffer, contentType)
+    const trimmed=text.trimStart()
+
+    if(!(trimmed.startsWith('<')||trimmed.startsWith('<?xml'))){
+      throw new Error('Отримано не XML')
+    }
+
+    xmlCnt=text
     st.style.color='var(--green)'
-    st.textContent='✅ XML завантажено через Worker'
+    st.textContent=`✅ XML завантажено через Worker (${charset})`
     document.getElementById('vStep2').style.display='block'
     document.getElementById('vPrev').textContent=xmlCnt.substring(0,2000)+(xmlCnt.length>2000?'\n...':'')
   }catch(e){
@@ -130,11 +230,38 @@ async function loadUrl(){
   }
 }
 
-function buildXml(data){const now=new Date().toISOString().slice(0,16).replace('T',' '),cats={},offers=[],errors=[];data.forEach((row,i)=>{const oid=cv(row['Offer ID']),nua=cv(row['Название (украинский)']),price=cv(row['Цена']),cid=cv(row['ID Категории']),vendor=cv(row['Бренд']),dua=cv(row['Описание (украинский)']),imgs=cv(row['Изображения']);if(!oid||!nua||!price||!cid||!vendor||!dua||!imgs){errors.push({row:i+2,id:oid||'—',name:nua||'—',errors:'неповні обов\'язкові поля'});return}if(!cats[cid])cats[cid]=cv(row['Категория']);const pics=imgs.split(',').slice(0,15).map(u=>u.trim()).filter(Boolean).map(u=>`    <picture><![CDATA[${u}]]></picture>`).join('\n');let o=`  <offer id="${esc(oid)}" available="true">\n    <price>${esc(price)}</price>\n    <stock_quantity>${esc(cv(row['Количество'])||'0')}</stock_quantity>\n    <currencyId>${esc(cv(row['Валюта'])||'UAH')}</currencyId>\n    <categoryId>${esc(cid)}</categoryId>\n${pics}\n    <vendor>${esc(vendor)}</vendor>\n    <name_ua><![CDATA[${nua}]]></name_ua>\n    <description_ua><![CDATA[${dua}]]></description_ua>\n`;for(let k=0;k<=24;k++){const s=k?'.'+k:'';const ch=cv(row['Характеристика'+s]),va=cv(row['Значение'+s]);if(ch&&va)o+=`    <param name="${esc(ch)}">${esc(va)}</param>\n`}o+='  </offer>';offers.push(o)});const cxml=Object.entries(cats).map(([id,n])=>`    <category id="${esc(id)}">${esc(n)}</category>`).join('\n');return{xml:`<?xml version="1.0" encoding="UTF-8"?>\n<yml_catalog date="${now}">\n  <shop>\n    <name>EVA</name>\n    <company>EVA</company>\n    <url>https://eva.ua/</url>\n    <currencies>\n      <currency id="UAH" rate="1"/>\n      <currency id="USD" rate="44"/>\n      <currency id="EUR" rate="50"/>\n    </currencies>\n    <categories>\n${cxml}\n    </categories>\n    <offers>\n${offers.join('\n')}\n    </offers>\n  </shop>\n</yml_catalog>`,errors}}
-function convertExcel(){if(!eData){alert('Завантажте Excel файл');return}animateProg('eProg','eRing','ePl',Math.max(700,eData.length*3),'Конвертація...',()=>{const r=buildXml(eData);xmlRes=r.xml;eErrRows=r.errors;document.getElementById('eStep3').style.display='block';const cnt=(r.xml.match(/<offer /g)||[]).length;document.getElementById('eMsg').innerHTML=cnt?`<div class="rok">🎉 Готово! Сформовано ${cnt} товарів. Пропущено: ${r.errors.length}.</div>`:`<div class="rfail">⛔ Не сформовано жодного товару.</div>`;document.getElementById('eDlRow').style.display=cnt?'grid':'none';document.getElementById('ePrev').textContent=r.xml.substring(0,3000)+(r.xml.length>3000?'\n...':'')})}
+function buildXml(data){
+  const now=new Date().toISOString().slice(0,16).replace('T',' ')
+  const cats={},offers=[],errors=[]
+  data.forEach((row,i)=>{
+    const oid=cv(row['Offer ID']),nua=cv(row['Название (украинский)']),price=cv(row['Цена']),cid=cv(row['ID Категории']),vendor=cv(row['Бренд']),dua=cv(row['Описание (украинский)']),imgs=cv(row['Изображения'])
+    if(!oid||!nua||!price||!cid||!vendor||!dua||!imgs){errors.push({row:i+2,id:oid||'—',name:nua||'—',errors:'неповні обов\'язкові поля'});return}
+    if(!cats[cid])cats[cid]=cv(row['Категория'])
+    const pics=imgs.split(',').slice(0,15).map(u=>u.trim()).filter(Boolean).map(u=>`    <picture><![CDATA[${u}]]></picture>`).join('\n')
+    let o=`  <offer id="${esc(oid)}" available="true">\n    <price>${esc(price)}</price>\n    <stock_quantity>${esc(cv(row['Количество'])||'0')}</stock_quantity>\n    <currencyId>${esc(cv(row['Валюта'])||'UAH')}</currencyId>\n    <categoryId>${esc(cid)}</categoryId>\n${pics}\n    <vendor>${esc(vendor)}</vendor>\n    <name_ua><![CDATA[${nua}]]></name_ua>\n    <description_ua><![CDATA[${dua}]]></description_ua>\n`
+    for(let k=0;k<=24;k++){const s=k?'.'+k:'';const ch=cv(row['Характеристика'+s]),va=cv(row['Значение'+s]);if(ch&&va)o+=`    <param name="${esc(ch)}">${esc(va)}</param>\n`}
+    o+='  </offer>'
+    offers.push(o)
+  })
+  const cxml=Object.entries(cats).map(([id,n])=>`    <category id="${esc(id)}">${esc(n)}</category>`).join('\n')
+  return{xml:`<?xml version="1.0" encoding="UTF-8"?>\n<yml_catalog date="${now}">\n  <shop>\n    <name>EVA</name>\n    <company>EVA</company>\n    <url>https://eva.ua/</url>\n    <currencies>\n      <currency id="UAH" rate="1"/>\n      <currency id="USD" rate="44"/>\n      <currency id="EUR" rate="50"/>\n    </currencies>\n    <categories>\n${cxml}\n    </categories>\n    <offers>\n${offers.join('\n')}\n    </offers>\n  </shop>\n</yml_catalog>`,errors}
+}
+
+function convertExcel(){
+  if(!eData){alert('Завантажте Excel файл');return}
+  animateProg('eProg','eRing','ePl',Math.max(700,eData.length*3),'Конвертація...',()=>{
+    const r=buildXml(eData)
+    xmlRes=r.xml
+    eErrRows=r.errors
+    document.getElementById('eStep3').style.display='block'
+    const cnt=(r.xml.match(/<offer /g)||[]).length
+    document.getElementById('eMsg').innerHTML=cnt?`<div class="rok">🎉 Готово! Сформовано ${cnt} товарів. Пропущено: ${r.errors.length}.</div>`:`<div class="rfail">⛔ Не сформовано жодного товару.</div>`
+    document.getElementById('eDlRow').style.display=cnt?'grid':'none'
+    document.getElementById('ePrev').textContent=r.xml.substring(0,3000)+(r.xml.length>3000?'\n...':'')
+  })
+}
+
 function doVal(c){
-  // Виправляємо encoding declaration щоб DOMParser не конфліктував
-  c=c.replace(/<\?xml[^?]*\?>/i,'<?xml version="1.0" encoding="UTF-8"?>')
   if(/[\x00-\x08\x0B\x0C\x0E-\x1F]/.test(c)){
     return{errCounts:{'Недруковані ASCII символи в XML':1},warnCounts:{},products:[],attrCounts:{},paramCounts:{},total:0,valid:0,invalid:0,cats:0,errCount:1,warnCount:0}
   }
@@ -143,6 +270,7 @@ function doVal(c){
   let total=0,valid=0,invalid=0,cats=doc.querySelectorAll('categories category').length,errCount=0,warnCount=0
   if(doc.querySelector('parsererror'))return{errCounts:{'XML не валідний':1},warnCounts,products,attrCounts,paramCounts,total:0,valid:0,invalid:0,cats:0,errCount:1,warnCount:0}
   if(!doc.querySelector('shop'))return{errCounts:{'Відсутній тег shop':1},warnCounts,products,attrCounts,paramCounts,total:0,valid:0,invalid:0,cats:0,errCount:1,warnCount:0}
+
   const date=(doc.querySelector('yml_catalog')&&doc.querySelector('yml_catalog').getAttribute('date'))||''
   const ids=new Set(),names=new Set()
   doc.querySelectorAll('shop offers offer').forEach(o=>{
@@ -159,6 +287,7 @@ function doVal(c){
     const pics=[].slice.call(o.querySelectorAll('picture')).map(x=>cv(x.textContent)).filter(Boolean)
     const dUa=cv(o.querySelector('description_ua')&&o.querySelector('description_ua').textContent)
     const params=[].slice.call(o.querySelectorAll('param')).map(p=>({name:cv(p.getAttribute('name')),value:cv(p.textContent)}))
+
     if(!/^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}$/.test(date))e.push('некоректний yml_catalog@date')
     if(!id||id==='—')e.push('немає id');else if(ids.has(id))e.push('дублікат id');else ids.add(id)
     if(!nameUa)e.push('немає name_ua')
@@ -188,7 +317,35 @@ function doVal(c){
   })
   return{errCounts,warnCounts,products,attrCounts,paramCounts,total,valid,invalid,cats,errCount,warnCount}
 }
-function validateXml(){if(!xmlCnt){alert('Завантажте XML');return}animateProg('vProg','vRing','vPl',1200,'Перевірка EVA...',()=>{const r=doVal(xmlCnt);document.getElementById('vT').textContent=r.total;document.getElementById('vV').textContent=r.valid;document.getElementById('vI').textContent=r.invalid;document.getElementById('vC').textContent=r.cats;document.getElementById('vStep3').style.display='block';document.getElementById('vMsg').innerHTML=(!r.errCount&&!r.warnCount)?'<div class="rok">🎉 XML повністю валідний!</div>':'';document.getElementById('errSumWrap').style.display=r.errCount?'block':'none';document.getElementById('warnSumWrap').style.display=r.warnCount?'block':'none';document.getElementById('errSum').innerHTML=Object.entries(r.errCounts).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('');document.getElementById('warnSum').innerHTML=Object.entries(r.warnCounts).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('');eErrRows=r.products.filter(x=>x.status==='invalid').map(x=>({row:'—',id:x.id,name:x.name,errors:x.errors.join('; ')}));prodRows=r.products;prodFiltered=[...prodRows];fillCats();pPage=1;renderProducts();document.getElementById('vProducts').style.display='block';attrMap=r.attrCounts;paramMap=r.paramCounts;renderStructure();document.getElementById('vStruct').style.display='block'})}
+
+function validateXml(){
+  if(!xmlCnt){alert('Завантажте XML');return}
+  animateProg('vProg','vRing','vPl',1200,'Перевірка EVA...',()=>{
+    const r=doVal(xmlCnt)
+    document.getElementById('vT').textContent=r.total
+    document.getElementById('vV').textContent=r.valid
+    document.getElementById('vI').textContent=r.invalid
+    document.getElementById('vC').textContent=r.cats
+    document.getElementById('vStep3').style.display='block'
+    document.getElementById('vMsg').innerHTML=(!r.errCount&&!r.warnCount)?'<div class="rok">🎉 XML повністю валідний!</div>':''
+    document.getElementById('errSumWrap').style.display=r.errCount?'block':'none'
+    document.getElementById('warnSumWrap').style.display=r.warnCount?'block':'none'
+    document.getElementById('errSum').innerHTML=Object.entries(r.errCounts).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('')
+    document.getElementById('warnSum').innerHTML=Object.entries(r.warnCounts).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('')
+    eErrRows=r.products.filter(x=>x.status==='invalid').map(x=>({row:'—',id:x.id,name:x.name,errors:x.errors.join('; ')}))
+    prodRows=r.products
+    prodFiltered=[...prodRows]
+    fillCats()
+    pPage=1
+    renderProducts()
+    document.getElementById('vProducts').style.display='block'
+    attrMap=r.attrCounts
+    paramMap=r.paramCounts
+    renderStructure()
+    document.getElementById('vStruct').style.display='block'
+  })
+}
+
 function fillCats(){const s=document.getElementById('pCat');const cats=[...new Set(prodRows.map(r=>r.categoryId))].sort();s.innerHTML='<option value="all">Всі категорії</option>'+cats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('')}
 function applyProductFilters(){const q=document.getElementById('pSearch').value.trim().toLowerCase(),st=document.getElementById('pStatus').value,cat=document.getElementById('pCat').value;prodFiltered=prodRows.filter(r=>((r.id+' '+r.name+' '+r.vendor).toLowerCase().includes(q))&&(st==='all'||r.status===st)&&(cat==='all'||r.categoryId===cat));pPage=1;renderProducts()}
 function setProductView(v){pView=v;document.getElementById('vTableBtn').classList.toggle('act',v==='table');document.getElementById('vCardBtn').classList.toggle('act',v==='cards');document.getElementById('pTableWrap').style.display=v==='table'?'block':'none';document.getElementById('pCards').style.display=v==='cards'?'grid':'none';renderProducts()}
@@ -198,7 +355,8 @@ document.getElementById('pBody').innerHTML=arr.map((r,i)=>`<tr><td>${esc(r.id)}<
 document.getElementById('pCards').innerHTML=arr.map((r,i)=>`<div class="pcard">${r.pictures[0]?`<img class="pimg" src="${esc(r.pictures[0])}" alt="">`:`<div class="pimg" style="display:flex;align-items:center;justify-content:center;color:var(--muted)">Немає фото</div>`}<div class="pbody"><div class="pt">${esc(r.name)}</div><div class="pm">ID: ${esc(r.id)}</div><div class="pm">Бренд: ${esc(r.vendor)}</div><div class="pm">Ціна: ${esc(r.price)} ${esc(r.currency)}</div><div class="pm">Категорія: ${esc(r.categoryId)}</div><button class="tprev" onclick="openCard(${st+i})">Повна картка</button></div></div>`).join('')||'<div class="pm">Нічого не знайдено</div>'}
 function openCard(i){const p=prodFiltered[i];if(!p)return;const thumbs=p.pictures.map(u=>`<img style="width:62px;height:62px;object-fit:cover;border:1px solid var(--border);border-radius:7px;cursor:pointer" src="${esc(u)}" onclick="setMain('${esc(u)}')">`).join('');const params=p.params.map(pm=>`<tr><td>${esc(pm.name||'—')}</td><td>${esc(pm.value||'—')}</td></tr>`).join('')||'<tr><td colspan="2">Параметри відсутні</td></tr>';document.getElementById('mbox').innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center"><b>${esc(p.name)}</b><button class="tprev" onclick="forceClose()">Закрити ✕</button></div><div style="display:grid;grid-template-columns:1.1fr .9fr;gap:12px;margin-top:10px">${p.pictures[0]?`<div><img id="mainPic" style="width:100%;max-height:360px;object-fit:contain;border:1px solid var(--border);border-radius:10px" src="${esc(p.pictures[0])}"><div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:8px">${thumbs}</div></div>`:`<div style="height:260px;display:flex;align-items:center;justify-content:center;color:var(--muted);border:1px solid var(--border);border-radius:10px">Немає фото</div>`}<div><div class="pm">ID: ${esc(p.id)}</div><div class="pm">Артикул: ${esc(p.article)}</div><div class="pm">Бренд: ${esc(p.vendor)}</div><div class="pm">Категорія: ${esc(p.categoryId)}</div><div class="pm">Ціна: ${esc(p.price)} ${esc(p.currency)}</div><div class="pm">Наявність: ${esc(p.available)}</div><div class="pm">Помилки: ${esc(p.errors.join('; ')||'немає')}</div><div class="pm">Попередження: ${esc(p.warnings.join('; ')||'немає')}</div></div></div><div class="pm" style="margin-top:10px">${esc(p.descriptionUa||'—')}</div><table class="prod-table"><thead><tr><th>Параметр</th><th>Значення</th></tr></thead><tbody>${params}</tbody></table>`;document.getElementById('pmodal').classList.add('show')}
 function setMain(src){const i=document.getElementById('mainPic');if(i)i.src=src}
-function closeModal(e){if(e.target.id==='pmodal')forceClose()}function forceClose(){document.getElementById('pmodal').classList.remove('show')}
+function closeModal(e){if(e.target.id==='pmodal')forceClose()}
+function forceClose(){document.getElementById('pmodal').classList.remove('show')}
 function renderStructure(){document.getElementById('attrBody').innerHTML=Object.entries(attrMap).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('')||'<tr><td colspan="2">Немає даних</td></tr>';document.getElementById('paramBody').innerHTML=Object.entries(paramMap).sort((a,b)=>b[1]-a[1]).slice(0,50).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('')||'<tr><td colspan="2">Немає даних</td></tr>'}
 function dlXml(t){const c=t==='excel'?xmlRes:xmlCnt;if(!c)return;const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:'application/xml'}));a.download=t==='excel'?'eva_pricelist.xml':'eva_validated.xml';a.click()}
 function copyLink(){if(!xmlRes)return;navigator.clipboard.writeText('data:application/xml;base64,'+btoa(unescape(encodeURIComponent(xmlRes)))).then(()=>alert('✅ Посилання скопійовано')).catch(()=>dlXml('excel'))}
