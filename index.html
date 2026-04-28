@@ -10,6 +10,7 @@
 :root{--orange:#FF6B00;--ol:#FF9A3C;--green:#1DB954;--gd:#149040;--bg:#060A0E;--sf:rgba(255,255,255,0.04);--border:rgba(255,107,0,0.2);--text:#F0F4F8;--muted:rgba(240,244,248,0.5);--err:#FF3B3B;--warn:#FFB800}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Exo 2',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+button,input,select{font:inherit}
 .bg-layer{position:fixed;inset:0;z-index:0;pointer-events:none}
 .bg-g{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 10% 20%,rgba(255,107,0,.12),transparent 60%),radial-gradient(ellipse 60% 80% at 90% 80%,rgba(29,185,84,.10),transparent 60%)}
 .bg-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,107,0,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,107,0,.04) 1px,transparent 1px);background-size:60px 60px}
@@ -19,16 +20,8 @@ body{font-family:'Exo 2',sans-serif;background:var(--bg);color:var(--text);min-h
 .bg-logo:nth-child(5){font-size:20vw;bottom:-5%;left:20%;transform:rotate(-8deg)}
 .wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:30px 20px 90px}
 
-header{
-  display:flex;align-items:center;gap:16px;margin-bottom:28px;padding:20px 26px;
-  background:linear-gradient(135deg,rgba(255,107,0,.15),rgba(29,185,84,.1));
-  border:1px solid rgba(255,107,0,.3);border-radius:20px;position:relative;overflow:hidden;z-index:1
-}
-header::before{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(90deg,rgba(255,107,0,.08),transparent 50%,rgba(29,185,84,.06));
-  pointer-events:none
-}
+header{display:flex;align-items:center;gap:16px;margin-bottom:28px;padding:20px 26px;background:linear-gradient(135deg,rgba(255,107,0,.15),rgba(29,185,84,.1));border:1px solid rgba(255,107,0,.3);border-radius:20px;position:relative;overflow:hidden;z-index:1}
+header::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,107,0,.08),transparent 50%,rgba(29,185,84,.06));pointer-events:none}
 .logo-box{width:64px;height:64px;border-radius:14px;background:linear-gradient(135deg,var(--orange),var(--ol));display:flex;align-items:center;justify-content:center;font-weight:900;z-index:1}
 .logo-box img{width:100%;height:100%;object-fit:contain;border-radius:14px}
 .htext{z-index:1}
@@ -36,13 +29,11 @@ header::before{
 .htext p{font-size:.84rem;color:var(--muted)}
 .badge{margin-left:auto;background:rgba(29,185,84,.15);border:1px solid rgba(29,185,84,.4);padding:5px 12px;border-radius:999px;color:var(--green);font-size:.72rem;font-weight:700;z-index:1}
 
-.tabs{
-  display:flex;gap:8px;background:rgba(255,255,255,.03);border:1px solid var(--border);
-  border-radius:14px;padding:5px;margin-bottom:20px;position:relative;z-index:5
-}
-.tab-btn{flex:1;border:none;padding:12px;background:transparent;color:var(--muted);border-radius:10px;font-weight:700;cursor:pointer}
+.tabs{display:flex;gap:8px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:5px;margin-bottom:20px;position:relative;z-index:50}
+.tab-btn{flex:1;border:none;padding:12px;background:transparent;color:var(--muted);border-radius:10px;font-weight:700;cursor:pointer;position:relative;z-index:51}
 .tab-btn.active{background:linear-gradient(135deg,var(--orange),var(--ol));color:#fff}
-.tab-btn.active.g{background:linear-gradient(135deg,var(--gd),var(--green))}
+.tab-btn.active.g{background:linear-gradient(135deg,var(--gd),var(--green));color:#fff}
+
 .panel{display:none;position:relative;z-index:1}
 .panel.active{display:block}
 
@@ -51,6 +42,7 @@ header::before{
 .card.g::before{background:linear-gradient(180deg,var(--gd),var(--green))}
 .card.b::before{background:linear-gradient(180deg,#2a70c2,#4a90e2)}
 .card.w::before{background:linear-gradient(180deg,var(--warn),#ffd060)}
+
 .sh{display:flex;align-items:center;gap:10px;margin-bottom:8px}
 .sn{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--orange),var(--ol));font-weight:800;font-size:.8rem}
 .sn.g{background:linear-gradient(135deg,var(--gd),var(--green))}
@@ -83,10 +75,11 @@ header::before{
 .src-opt.active{border-color:var(--orange)}
 .src-panel{display:none}
 .src-panel.active{display:block}
+
 .url-row{display:flex;gap:8px;flex-wrap:wrap}
 .url-wrap{flex:1;min-width:220px;position:relative}
 .url-wrap input{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:10px;padding:11px 36px 11px 12px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.8rem}
-.url-clear{position:absolute;right:9px;top:50%;transform:translateY(-50%);display:none}
+.url-clear{position:absolute;right:9px;top:50%;transform:translateY(-50%);display:none;background:none;border:none;color:var(--muted);cursor:pointer}
 .url-clear.show{display:block}
 
 .sgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}
@@ -108,6 +101,7 @@ header::before{
 .xprev{display:none;background:rgba(0,0,0,.35);border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:8px;font-family:'JetBrains Mono',monospace;font-size:.72rem;max-height:220px;overflow:auto;white-space:pre-wrap;word-break:break-all}
 .xprev.show{display:block}
 .tprev{border:1px solid var(--border);background:none;color:var(--muted);padding:6px 11px;border-radius:8px;cursor:pointer;margin-top:8px}
+
 .div{height:1px;background:linear-gradient(90deg,transparent,var(--orange),var(--green),transparent);margin:18px 0;border:none}
 .prog{display:none;align-items:center;justify-content:center;gap:12px;padding:12px}
 .prog.show{display:flex}
@@ -134,39 +128,164 @@ footer{position:fixed;bottom:12px;right:18px;font-size:.69rem;color:rgba(255,255
 </head>
 <body>
 <div class="bg-layer"><div class="bg-g"></div><div class="bg-grid"></div><div class="bg-logo">EVA</div><div class="bg-logo">EVA</div><div class="bg-logo">EVA</div></div>
+
 <div class="wrap">
-<header><div class="logo-box"><img src="EVA_LOGO.png" alt="EVA" onerror="this.outerHTML='<span>EVA</span>'"/></div><div class="htext"><h1>Валідація прайс листу та форматування</h1><p>Перевірка та конвертація прайс-листів для EVA Marketplace</p></div><div class="badge">● ONLINE</div></header>
+<header>
+  <div class="logo-box"><img src="EVA_LOGO.png" alt="EVA" onerror="this.outerHTML='<span>EVA</span>'"/></div>
+  <div class="htext">
+    <h1>Валідація прайс листу та форматування</h1>
+    <p>Перевірка та конвертація прайс-листів для EVA Marketplace</p>
+  </div>
+  <div class="badge">● ONLINE</div>
+</header>
 
 <div class="tabs">
-  <button type="button" class="tab-btn active" onclick="switchTab('excel')">📊 Excel → XML</button>
-  <button type="button" class="tab-btn" onclick="switchTab('valid')">✅ Валідація XML</button>
+  <button type="button" class="tab-btn active" data-tab="excel">📊 Excel → XML</button>
+  <button type="button" class="tab-btn" data-tab="valid">✅ Валідація XML</button>
 </div>
 
 <div class="panel active" id="panel-excel">
-  <div class="card w"><div class="sh"><div class="sn">?</div><div class="st">Вимоги до Excel</div></div><div class="hint">Обов'язкові: Offer ID, Назва товару, Ціна, Валюта, ID Категорії, Бренд, Зображення, Опис, Наявність. Максимум файлу: 250 МБ.</div></div>
-  <div class="card"><div class="sh"><div class="sn">1</div><div class="st">Завантажте ваш прайс-лист</div></div><div class="drop" id="excelDrop" ondragover="dov(event)" ondragleave="dol(event,'excelDrop')" ondrop="ddr(event,'excel')"><input type="file" accept=".xlsx,.xls" onchange="hf(this,'excel')"/><div class="di">📂</div><div class="dt">Перетягніть файл сюди або натисніть</div><div class="ds">Excel .xlsx/.xls</div><span class="dlim">до 250 МБ</span></div><div class="finfo" id="efi"><span>📄</span><div><div class="fname" id="efn">—</div><div class="fsize" id="efs">—</div></div><button class="frem" onclick="rmf('excel')">✕ Видалити</button></div></div>
-  <div class="card g" id="eStep2" style="display:none"><div class="sh"><div class="sn g">2</div><div class="st">Конвертація у XML</div></div><div class="prog" id="eProg"><div class="ring" id="eRing"></div><div class="pl" id="ePl">Обробка...</div></div><button class="btn btn-o" onclick="convertExcel()">🔄 Конвертувати</button></div>
-  <div class="card b" id="eStep3" style="display:none"><div class="sh"><div class="sn b">3</div><div class="st">Результат конвертації</div></div><div id="eMsg"></div><div class="btn-row" id="eDlRow" style="display:none"><button class="btn btn-g" onclick="dlXml('excel')">⬇️ Завантажити XML</button><button class="btn btn-b" onclick="copyLink()">🔗 Скопіювати посилання</button></div><button class="tprev" onclick="tp('ePrev')">👁️ Переглянути XML</button><div class="xprev" id="ePrev"></div></div>
+  <div class="card w">
+    <div class="sh"><div class="sn">?</div><div class="st">Вимоги до Excel</div></div>
+    <div class="hint">Обов'язкові: Offer ID, Назва товару, Ціна, Валюта, ID Категорії, Бренд, Зображення, Опис, Наявність. Максимум файлу: 250 МБ.</div>
+  </div>
+
+  <div class="card">
+    <div class="sh"><div class="sn">1</div><div class="st">Завантажте ваш прайс-лист</div></div>
+    <div class="drop" id="excelDrop" ondragover="dov(event)" ondragleave="dol(event,'excelDrop')" ondrop="ddr(event,'excel')">
+      <input type="file" accept=".xlsx,.xls" onchange="hf(this,'excel')"/>
+      <div class="di">📂</div>
+      <div class="dt">Перетягніть файл сюди або натисніть</div>
+      <div class="ds">Excel .xlsx/.xls</div>
+      <span class="dlim">до 250 МБ</span>
+    </div>
+    <div class="finfo" id="efi">
+      <span>📄</span>
+      <div><div class="fname" id="efn">—</div><div class="fsize" id="efs">—</div></div>
+      <button class="frem" onclick="rmf('excel')">✕ Видалити</button>
+    </div>
+  </div>
+
+  <div class="card g" id="eStep2" style="display:none">
+    <div class="sh"><div class="sn g">2</div><div class="st">Конвертація у XML</div></div>
+    <div class="prog" id="eProg"><div class="ring" id="eRing"></div><div class="pl" id="ePl">Обробка...</div></div>
+    <button class="btn btn-o" onclick="convertExcel()">🔄 Конвертувати</button>
+  </div>
+
+  <div class="card b" id="eStep3" style="display:none">
+    <div class="sh"><div class="sn b">3</div><div class="st">Результат конвертації</div></div>
+    <div id="eMsg"></div>
+    <div class="btn-row" id="eDlRow" style="display:none">
+      <button class="btn btn-g" onclick="dlXml('excel')">⬇️ Завантажити XML</button>
+      <button class="btn btn-b" onclick="copyLink()">🔗 Скопіювати посилання</button>
+    </div>
+    <button class="tprev" onclick="tp('ePrev')">👁️ Переглянути XML</button>
+    <div class="xprev" id="ePrev"></div>
+  </div>
 </div>
 
 <div class="panel" id="panel-valid">
-  <div class="card"><div class="sh"><div class="sn">1</div><div class="st">Оберіть джерело XML</div></div></div>
-  <div class="src-sel"><div class="src-opt active" id="sFile" onclick="ss('file')"><div>📁</div><div><strong>XML Файл</strong><div class="pm">З комп'ютера</div></div></div><div class="src-opt" id="sUrl" onclick="ss('url')"><div>🌐</div><div><strong>URL Посилання</strong><div class="pm">До 300 МБ</div></div></div></div>
+  <div class="card">
+    <div class="sh"><div class="sn">1</div><div class="st">Оберіть джерело XML</div></div>
+  </div>
 
-  <div class="src-panel active" id="sp-file"><div class="drop" id="xmlDrop" ondragover="dov(event)" ondragleave="dol(event,'xmlDrop')" ondrop="ddr(event,'xml')"><input type="file" accept=".xml" onchange="hf(this,'xml')"/><div class="di">📋</div><div class="dt">Перетягніть XML</div><span class="dlim">до 250 МБ</span></div><div class="finfo" id="vfi"><span>📄</span><div><div class="fname" id="vfn">—</div><div class="fsize" id="vfs">—</div></div><button class="frem" onclick="rmf('xml')">✕ Видалити</button></div></div>
+  <div class="src-sel">
+    <div class="src-opt active" id="sFile" onclick="ss('file')">
+      <div>📁</div>
+      <div><strong>XML Файл</strong><div class="pm">З комп'ютера</div></div>
+    </div>
+    <div class="src-opt" id="sUrl" onclick="ss('url')">
+      <div>🌐</div>
+      <div><strong>URL Посилання</strong><div class="pm">До 300 МБ</div></div>
+    </div>
+  </div>
 
-  <div class="src-panel" id="sp-url"><div class="card" style="margin-bottom:0"><div class="url-row"><div class="url-wrap"><input type="text" id="urlIn" placeholder="https://example.com/feed.xml" oninput="urlTyped()"/><button class="url-clear" id="urlClr" onclick="clearUrl()">✕</button></div><button class="btn btn-o" style="width:auto;padding:11px 16px" onclick="loadUrl()">🔍 Перевірити</button></div><div id="urlSt" class="pm" style="margin-top:8px"></div></div></div>
+  <div class="src-panel active" id="sp-file">
+    <div class="drop" id="xmlDrop" ondragover="dov(event)" ondragleave="dol(event,'xmlDrop')" ondrop="ddr(event,'xml')">
+      <input type="file" accept=".xml" onchange="hf(this,'xml')"/>
+      <div class="di">📋</div>
+      <div class="dt">Перетягніть XML</div>
+      <span class="dlim">до 250 МБ</span>
+    </div>
+    <div class="finfo" id="vfi">
+      <span>📄</span>
+      <div><div class="fname" id="vfn">—</div><div class="fsize" id="vfs">—</div></div>
+      <button class="frem" onclick="rmf('xml')">✕ Видалити</button>
+    </div>
+  </div>
+
+  <div class="src-panel" id="sp-url">
+    <div class="card" style="margin-bottom:0">
+      <div class="url-row">
+        <div class="url-wrap">
+          <input type="text" id="urlIn" placeholder="https://example.com/feed.xml" oninput="urlTyped()"/>
+          <button type="button" class="url-clear" id="urlClr" onclick="clearUrl()">✕</button>
+        </div>
+        <button class="btn btn-o" style="width:auto;padding:11px 16px" onclick="loadUrl()">🔍 Перевірити</button>
+      </div>
+      <div id="urlSt" class="pm" style="margin-top:8px"></div>
+    </div>
+  </div>
 
   <hr class="div"/>
 
-  <div class="card g" id="vStep2" style="display:none"><div class="sh"><div class="sn g">2</div><div class="st">Перевірка XML на вимоги EVA</div></div><button class="tprev" onclick="tp('vPrev')">👁️ Переглянути XML</button><div class="xprev" id="vPrev"></div><div class="prog" id="vProg"><div class="ring" id="vRing"></div><div class="pl" id="vPl">Перевірка...</div></div><button class="btn btn-o" onclick="validateXml()">🔍 Перевірити XML</button></div>
+  <div class="card g" id="vStep2" style="display:none">
+    <div class="sh"><div class="sn g">2</div><div class="st">Перевірка XML на вимоги EVA</div></div>
+    <button class="tprev" onclick="tp('vPrev')">👁️ Переглянути XML</button>
+    <div class="xprev" id="vPrev"></div>
+    <div class="prog" id="vProg"><div class="ring" id="vRing"></div><div class="pl" id="vPl">Перевірка...</div></div>
+    <button class="btn btn-o" onclick="validateXml()">🔍 Перевірити XML</button>
+  </div>
 
-  <div class="card" id="vStep3" style="display:none"><div class="sh"><div class="sn g">3</div><div class="st">Результати перевірки</div></div><div class="sgrid"><div class="sc"><div class="sv" id="vT">0</div><div class="sl">Офферів</div></div><div class="sc"><div class="sv g" id="vV">0</div><div class="sl">Валідних</div></div><div class="sc"><div class="sv r" id="vI">0</div><div class="sl">З помилками</div></div><div class="sc"><div class="sv" id="vC">0</div><div class="sl">Категорій</div></div></div><div id="vMsg"></div><div id="errSumWrap" style="display:none"><table class="err-table"><thead><tr><th>Тип помилки</th><th>Кількість</th></tr></thead><tbody id="errSum"></tbody></table></div><div id="warnSumWrap" style="display:none"><table class="warn-table"><thead><tr><th>Попередження</th><th>Кількість</th></tr></thead><tbody id="warnSum"></tbody></table></div><div class="btn-row"><button class="btn btn-g" onclick="dlXml('valid')">⬇️ Завантажити XML</button><button class="btn btn-w" onclick="dlErrReport()">📥 Звіт помилок (.xlsx)</button></div></div>
+  <div class="card" id="vStep3" style="display:none">
+    <div class="sh"><div class="sn g">3</div><div class="st">Результати перевірки</div></div>
+    <div class="sgrid">
+      <div class="sc"><div class="sv" id="vT">0</div><div class="sl">Офферів</div></div>
+      <div class="sc"><div class="sv g" id="vV">0</div><div class="sl">Валідних</div></div>
+      <div class="sc"><div class="sv r" id="vI">0</div><div class="sl">З помилками</div></div>
+      <div class="sc"><div class="sv" id="vC">0</div><div class="sl">Категорій</div></div>
+    </div>
+    <div id="vMsg"></div>
+    <div id="errSumWrap" style="display:none"><table class="err-table"><thead><tr><th>Тип помилки</th><th>Кількість</th></tr></thead><tbody id="errSum"></tbody></table></div>
+    <div id="warnSumWrap" style="display:none"><table class="warn-table"><thead><tr><th>Попередження</th><th>Кількість</th></tr></thead><tbody id="warnSum"></tbody></table></div>
+    <div class="btn-row">
+      <button class="btn btn-g" onclick="dlXml('valid')">⬇️ Завантажити XML</button>
+      <button class="btn btn-w" onclick="dlErrReport()">📥 Звіт помилок (.xlsx)</button>
+    </div>
+  </div>
 
-  <div class="card b" id="vProducts" style="display:none"><div class="sh"><div class="sn b">4</div><div class="st">Товари прайс-листа</div></div><div class="ps-tools"><input id="pSearch" placeholder="Пошук ID/назва/бренд..." oninput="applyProductFilters()"/><select id="pStatus" onchange="applyProductFilters()"><option value="all">Всі</option><option value="valid">Валідні</option><option value="invalid">З помилками</option></select><select id="pCat" onchange="applyProductFilters()"><option value="all">Всі категорії</option></select><button class="vbtn act" id="vTableBtn" onclick="setProductView('table')">Таблиця</button><button class="vbtn" id="vCardBtn" onclick="setProductView('cards')">Картки</button></div><div id="pTableWrap"><table class="prod-table"><thead><tr><th>ID</th><th>Назва</th><th>Категорія</th><th>Ціна</th><th>Статус</th><th></th></tr></thead><tbody id="pBody"></tbody></table></div><div id="pCards" class="pgrid" style="display:none"></div><div class="btn-row"><button class="btn btn-b" onclick="chgPage(-1)">◀ Попередня</button><button class="btn btn-b" onclick="chgPage(1)">Наступна ▶</button></div><div id="pPage" class="pm" style="text-align:center">1/1</div></div>
+  <div class="card b" id="vProducts" style="display:none">
+    <div class="sh"><div class="sn b">4</div><div class="st">Товари прайс-листа</div></div>
+    <div class="ps-tools">
+      <input id="pSearch" placeholder="Пошук ID/назва/бренд..." oninput="applyProductFilters()"/>
+      <select id="pStatus" onchange="applyProductFilters()">
+        <option value="all">Всі</option>
+        <option value="valid">Валідні</option>
+        <option value="invalid">З помилками</option>
+      </select>
+      <select id="pCat" onchange="applyProductFilters()"><option value="all">Всі категорії</option></select>
+      <button class="vbtn act" id="vTableBtn" onclick="setProductView('table')">Таблиця</button>
+      <button class="vbtn" id="vCardBtn" onclick="setProductView('cards')">Картки</button>
+    </div>
+    <div id="pTableWrap">
+      <table class="prod-table">
+        <thead><tr><th>ID</th><th>Назва</th><th>Категорія</th><th>Ціна</th><th>Статус</th><th></th></tr></thead>
+        <tbody id="pBody"></tbody>
+      </table>
+    </div>
+    <div id="pCards" class="pgrid" style="display:none"></div>
+    <div class="btn-row">
+      <button class="btn btn-b" onclick="chgPage(-1)">◀ Попередня</button>
+      <button class="btn btn-b" onclick="chgPage(1)">Наступна ▶</button>
+    </div>
+    <div id="pPage" class="pm" style="text-align:center">1/1</div>
+  </div>
 
-  <div class="card w" id="vStruct" style="display:none"><div class="sh"><div class="sn">5</div><div class="st">Аналіз структури XML</div></div><table class="prod-table"><thead><tr><th>Атрибут offer</th><th>Кількість</th></tr></thead><tbody id="attrBody"></tbody></table><table class="warn-table"><thead><tr><th>param name</th><th>Кількість</th></tr></thead><tbody id="paramBody"></tbody></table></div>
-</div>
+  <div class="card w" id="vStruct" style="display:none">
+    <div class="sh"><div class="sn">5</div><div class="st">Аналіз структури XML</div></div>
+    <table class="prod-table"><thead><tr><th>Атрибут offer</th><th>Кількість</th></tr></thead><tbody id="attrBody"></tbody></table>
+    <table class="warn-table"><thead><tr><th>param name</th><th>Кількість</th></tr></thead><tbody id="paramBody"></tbody></table>
+  </div>
 </div>
 
 <div class="modal" id="pmodal" onclick="closeModal(event)"><div class="modal-box" id="mbox"></div></div>
@@ -179,18 +298,21 @@ const esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>
 const cv=v=>(v===null||v===undefined||v!==v)?'':String(v).trim()
 const fb=b=>b<1048576?(b/1024).toFixed(1)+' КБ':(b/1048576).toFixed(1)+' МБ'
 
+function bindTabs(){
+  document.querySelectorAll('.tab-btn[data-tab]').forEach(btn=>{
+    btn.addEventListener('click',()=>switchTab(btn.dataset.tab))
+  })
+}
 function switchTab(n){
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active','g'))
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'))
-  const isExcel=n==='excel'
-  const btns=document.querySelectorAll('.tab-btn')
-  const btn=isExcel?btns[0]:btns[1]
-  if(btn){
-    btn.classList.add('active')
-    if(!isExcel) btn.classList.add('g')
+  document.querySelectorAll('.tab-btn').forEach(btn=>btn.classList.remove('active','g'))
+  document.querySelectorAll('.panel').forEach(panel=>panel.classList.remove('active'))
+  const targetBtn=document.querySelector(`.tab-btn[data-tab="${n}"]`)
+  const targetPanel=document.getElementById(`panel-${n}`)
+  if(targetBtn){
+    targetBtn.classList.add('active')
+    if(n==='valid') targetBtn.classList.add('g')
   }
-  const panel=document.getElementById('panel-'+n)
-  if(panel) panel.classList.add('active')
+  if(targetPanel) targetPanel.classList.add('active')
 }
 
 function ss(src){
@@ -302,8 +424,36 @@ async function loadUrl(){
   }
 }
 
-function buildXml(data){const now=new Date().toISOString().slice(0,16).replace('T',' '),cats={},offers=[],errors=[];data.forEach((row,i)=>{const oid=cv(row['Offer ID']),nua=cv(row['Название (украинский)']),price=cv(row['Цена']),cid=cv(row['ID Категории']),vendor=cv(row['Бренд']),dua=cv(row['Описание (украинский)']),imgs=cv(row['Изображения']);if(!oid||!nua||!price||!cid||!vendor||!dua||!imgs){errors.push({row:i+2,id:oid||'—',name:nua||'—',errors:'неповні обов\\'язкові поля'});return}if(!cats[cid])cats[cid]=cv(row['Категория']);const pics=imgs.split(',').slice(0,15).map(u=>u.trim()).filter(Boolean).map(u=>`    <picture><![CDATA[${u}]]></picture>`).join('\n');let o=`  <offer id="${esc(oid)}" available="true">\n    <price>${esc(price)}</price>\n    <stock_quantity>${esc(cv(row['Количество'])||'0')}</stock_quantity>\n    <currencyId>${esc(cv(row['Валюта'])||'UAH')}</currencyId>\n    <categoryId>${esc(cid)}</categoryId>\n${pics}\n    <vendor>${esc(vendor)}</vendor>\n    <name_ua><![CDATA[${nua}]]></name_ua>\n    <description_ua><![CDATA[${dua}]]></description_ua>\n`;for(let k=0;k<=24;k++){const s=k?'.'+k:'';const ch=cv(row['Характеристика'+s]),va=cv(row['Значение'+s]);if(ch&&va)o+=`    <param name="${esc(ch)}">${esc(va)}</param>\n`}o+='  </offer>';offers.push(o)});const cxml=Object.entries(cats).map(([id,n])=>`    <category id="${esc(id)}">${esc(n)}</category>`).join('\n');return{xml:`<?xml version="1.0" encoding="UTF-8"?>\n<yml_catalog date="${now}">\n  <shop>\n    <name>EVA</name>\n    <company>EVA</company>\n    <url>https://eva.ua/</url>\n    <currencies>\n      <currency id="UAH" rate="1"/>\n      <currency id="USD" rate="44"/>\n      <currency id="EUR" rate="50"/>\n    </currencies>\n    <categories>\n${cxml}\n    </categories>\n    <offers>\n${offers.join('\n')}\n    </offers>\n  </shop>\n</yml_catalog>`,errors}}
-function convertExcel(){if(!eData){alert('Завантажте Excel файл');return}animateProg('eProg','eRing','ePl',Math.max(700,eData.length*3),'Конвертація...',()=>{const r=buildXml(eData);xmlRes=r.xml;eErrRows=r.errors;document.getElementById('eStep3').style.display='block';const cnt=(r.xml.match(/<offer /g)||[]).length;document.getElementById('eMsg').innerHTML=cnt?`<div class="rok">🎉 Готово! Сформовано ${cnt} товарів. Пропущено: ${r.errors.length}.</div>`:`<div class="rfail">⛔ Не сформовано жодного товару.</div>`;document.getElementById('eDlRow').style.display=cnt?'grid':'none';document.getElementById('ePrev').textContent=r.xml.substring(0,3000)+(r.xml.length>3000?'\n...':'')})}
+function buildXml(data){
+  const now=new Date().toISOString().slice(0,16).replace('T',' ')
+  const cats={},offers=[],errors=[]
+  data.forEach((row,i)=>{
+    const oid=cv(row['Offer ID']),nua=cv(row['Название (украинский)']),price=cv(row['Цена']),cid=cv(row['ID Категории']),vendor=cv(row['Бренд']),dua=cv(row['Описание (украинский)']),imgs=cv(row['Изображения'])
+    if(!oid||!nua||!price||!cid||!vendor||!dua||!imgs){errors.push({row:i+2,id:oid||'—',name:nua||'—',errors:"неповні обов'язкові поля"});return}
+    if(!cats[cid])cats[cid]=cv(row['Категория'])
+    const pics=imgs.split(',').slice(0,15).map(u=>u.trim()).filter(Boolean).map(u=>`    <picture><![CDATA[${u}]]></picture>`).join('\n')
+    let o=`  <offer id="${esc(oid)}" available="true">\n    <price>${esc(price)}</price>\n    <stock_quantity>${esc(cv(row['Количество'])||'0')}</stock_quantity>\n    <currencyId>${esc(cv(row['Валюта'])||'UAH')}</currencyId>\n    <categoryId>${esc(cid)}</categoryId>\n${pics}\n    <vendor>${esc(vendor)}</vendor>\n    <name_ua><![CDATA[${nua}]]></name_ua>\n    <description_ua><![CDATA[${dua}]]></description_ua>\n`
+    for(let k=0;k<=24;k++){const s=k?'.'+k:'';const ch=cv(row['Характеристика'+s]),va=cv(row['Значение'+s]);if(ch&&va)o+=`    <param name="${esc(ch)}">${esc(va)}</param>\n`}
+    o+='  </offer>'
+    offers.push(o)
+  })
+  const cxml=Object.entries(cats).map(([id,n])=>`    <category id="${esc(id)}">${esc(n)}</category>`).join('\n')
+  return{xml:`<?xml version="1.0" encoding="UTF-8"?>\n<yml_catalog date="${now}">\n  <shop>\n    <name>EVA</name>\n    <company>EVA</company>\n    <url>https://eva.ua/</url>\n    <currencies>\n      <currency id="UAH" rate="1"/>\n      <currency id="USD" rate="44"/>\n      <currency id="EUR" rate="50"/>\n    </currencies>\n    <categories>\n${cxml}\n    </categories>\n    <offers>\n${offers.join('\n')}\n    </offers>\n  </shop>\n</yml_catalog>`,errors}
+}
+
+function convertExcel(){
+  if(!eData){alert('Завантажте Excel файл');return}
+  animateProg('eProg','eRing','ePl',Math.max(700,eData.length*3),'Конвертація...',()=>{
+    const r=buildXml(eData)
+    xmlRes=r.xml
+    eErrRows=r.errors
+    document.getElementById('eStep3').style.display='block'
+    const cnt=(r.xml.match(/<offer /g)||[]).length
+    document.getElementById('eMsg').innerHTML=cnt?`<div class="rok">🎉 Готово! Сформовано ${cnt} товарів. Пропущено: ${r.errors.length}.</div>`:`<div class="rfail">⛔ Не сформовано жодного товару.</div>`
+    document.getElementById('eDlRow').style.display=cnt?'grid':'none'
+    document.getElementById('ePrev').textContent=r.xml.substring(0,3000)+(r.xml.length>3000?'\n...':'')
+  })
+}
 
 function doVal(c){
   if(/[\x00-\x08\x0B\x0C\x0E-\x1F]/.test(c)) return{errCounts:{'Недруковані ASCII символи в XML':1},warnCounts:{},products:[],attrCounts:{},paramCounts:{},total:0,valid:0,invalid:0,cats:0,errCount:1,warnCount:0}
@@ -436,6 +586,11 @@ function renderStructure(){document.getElementById('attrBody').innerHTML=Object.
 function dlXml(t){const c=t==='excel'?xmlRes:xmlCnt;if(!c)return;const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:'application/xml'}));a.download=t==='excel'?'eva_pricelist.xml':'eva_validated.xml';a.click()}
 function copyLink(){if(!xmlRes)return;navigator.clipboard.writeText('data:application/xml;base64,'+btoa(unescape(encodeURIComponent(xmlRes)))).then(()=>alert('✅ Посилання скопійовано')).catch(()=>dlXml('excel'))}
 function dlErrReport(){if(!eErrRows.length){alert('Помилок не знайдено');return}const wb=XLSX.utils.book_new();const ws=XLSX.utils.aoa_to_sheet([['Рядок','Offer ID','Назва','Помилки'],...eErrRows.map(r=>[r.row,r.id,r.name,r.errors])]);ws['!cols']=[{wch:10},{wch:18},{wch:34},{wch:60}];XLSX.utils.book_append_sheet(wb,ws,'Помилки');XLSX.writeFile(wb,`eva_errors_${new Date().toISOString().slice(0,10)}.xlsx`)}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  bindTabs()
+  switchTab('excel')
+})
 </script>
 </body>
 </html>
