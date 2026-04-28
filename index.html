@@ -106,13 +106,17 @@ async function loadUrl(){
       const errText=await r.text()
       throw new Error(errText||`HTTP ${r.status}`)
     }
-    const b=await r.blob()
-    if(b.size>MAX_URL_XML){
+    const ab=await r.arrayBuffer()
+    if(ab.byteLength>MAX_URL_XML){
       st.style.color='var(--err)'
       st.textContent='❌ XML через URL перевищує 300 МБ.'
       return
     }
-    const t=await b.text()
+    // Спочатку пробуємо UTF-8, якщо є битий символ — перекодовуємо з windows-1251
+    let t=new TextDecoder('utf-8').decode(ab)
+    if(t.includes('\uFFFD')){
+      t=new TextDecoder('windows-1251').decode(ab)
+    }
     const trimmed=t.replace(/^\uFEFF/,'').trimStart()
     if(!trimmed.startsWith('<')){throw new Error('Отримано не XML')}
     xmlCnt=t
@@ -129,6 +133,8 @@ async function loadUrl(){
 function buildXml(data){const now=new Date().toISOString().slice(0,16).replace('T',' '),cats={},offers=[],errors=[];data.forEach((row,i)=>{const oid=cv(row['Offer ID']),nua=cv(row['Название (украинский)']),price=cv(row['Цена']),cid=cv(row['ID Категории']),vendor=cv(row['Бренд']),dua=cv(row['Описание (украинский)']),imgs=cv(row['Изображения']);if(!oid||!nua||!price||!cid||!vendor||!dua||!imgs){errors.push({row:i+2,id:oid||'—',name:nua||'—',errors:'неповні обов\'язкові поля'});return}if(!cats[cid])cats[cid]=cv(row['Категория']);const pics=imgs.split(',').slice(0,15).map(u=>u.trim()).filter(Boolean).map(u=>`    <picture><![CDATA[${u}]]></picture>`).join('\n');let o=`  <offer id="${esc(oid)}" available="true">\n    <price>${esc(price)}</price>\n    <stock_quantity>${esc(cv(row['Количество'])||'0')}</stock_quantity>\n    <currencyId>${esc(cv(row['Валюта'])||'UAH')}</currencyId>\n    <categoryId>${esc(cid)}</categoryId>\n${pics}\n    <vendor>${esc(vendor)}</vendor>\n    <name_ua><![CDATA[${nua}]]></name_ua>\n    <description_ua><![CDATA[${dua}]]></description_ua>\n`;for(let k=0;k<=24;k++){const s=k?'.'+k:'';const ch=cv(row['Характеристика'+s]),va=cv(row['Значение'+s]);if(ch&&va)o+=`    <param name="${esc(ch)}">${esc(va)}</param>\n`}o+='  </offer>';offers.push(o)});const cxml=Object.entries(cats).map(([id,n])=>`    <category id="${esc(id)}">${esc(n)}</category>`).join('\n');return{xml:`<?xml version="1.0" encoding="UTF-8"?>\n<yml_catalog date="${now}">\n  <shop>\n    <name>EVA</name>\n    <company>EVA</company>\n    <url>https://eva.ua/</url>\n    <currencies>\n      <currency id="UAH" rate="1"/>\n      <currency id="USD" rate="44"/>\n      <currency id="EUR" rate="50"/>\n    </currencies>\n    <categories>\n${cxml}\n    </categories>\n    <offers>\n${offers.join('\n')}\n    </offers>\n  </shop>\n</yml_catalog>`,errors}}
 function convertExcel(){if(!eData){alert('Завантажте Excel файл');return}animateProg('eProg','eRing','ePl',Math.max(700,eData.length*3),'Конвертація...',()=>{const r=buildXml(eData);xmlRes=r.xml;eErrRows=r.errors;document.getElementById('eStep3').style.display='block';const cnt=(r.xml.match(/<offer /g)||[]).length;document.getElementById('eMsg').innerHTML=cnt?`<div class="rok">🎉 Готово! Сформовано ${cnt} товарів. Пропущено: ${r.errors.length}.</div>`:`<div class="rfail">⛔ Не сформовано жодного товару.</div>`;document.getElementById('eDlRow').style.display=cnt?'grid':'none';document.getElementById('ePrev').textContent=r.xml.substring(0,3000)+(r.xml.length>3000?'\n...':'')})}
 function doVal(c){
+  // Виправляємо encoding declaration щоб DOMParser не конфліктував
+  c=c.replace(/<\?xml[^?]*\?>/i,'<?xml version="1.0" encoding="UTF-8"?>')
   if(/[\x00-\x08\x0B\x0C\x0E-\x1F]/.test(c)){
     return{errCounts:{'Недруковані ASCII символи в XML':1},warnCounts:{},products:[],attrCounts:{},paramCounts:{},total:0,valid:0,invalid:0,cats:0,errCount:1,warnCount:0}
   }
