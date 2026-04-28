@@ -10,518 +10,150 @@
 :root{--orange:#FF6B00;--ol:#FF9A3C;--green:#1DB954;--gd:#149040;--bg:#060A0E;--sf:rgba(255,255,255,0.04);--border:rgba(255,107,0,0.2);--text:#F0F4F8;--muted:rgba(240,244,248,0.5);--err:#FF3B3B;--warn:#FFB800}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Exo 2',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-button,input,select{font:inherit}
-.bg-layer{position:fixed;inset:0;z-index:0;pointer-events:none}
-.bg-g{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 10% 20%,rgba(255,107,0,.12),transparent 60%),radial-gradient(ellipse 60% 80% at 90% 80%,rgba(29,185,84,.10),transparent 60%)}
-.bg-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,107,0,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,107,0,.04) 1px,transparent 1px);background-size:60px 60px}
-.bg-logo{position:absolute;font-weight:900;color:rgba(255,107,0,.035);letter-spacing:.15em}
-.bg-logo:nth-child(3){font-size:18vw;top:-4%;left:-3%;transform:rotate(-15deg)}
-.bg-logo:nth-child(4){font-size:12vw;top:30%;right:-2%;transform:rotate(10deg)}
-.bg-logo:nth-child(5){font-size:20vw;bottom:-5%;left:20%;transform:rotate(-8deg)}
+.bg-layer{position:fixed;inset:0;z-index:0;pointer-events:none}.bg-g{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 10% 20%,rgba(255,107,0,.12),transparent 60%),radial-gradient(ellipse 60% 80% at 90% 80%,rgba(29,185,84,.10),transparent 60%)}.bg-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,107,0,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,107,0,.04) 1px,transparent 1px);background-size:60px 60px}
+.bg-logo{position:absolute;font-weight:900;color:rgba(255,107,0,.035);letter-spacing:.15em}.bg-logo:nth-child(3){font-size:18vw;top:-4%;left:-3%;transform:rotate(-15deg)}.bg-logo:nth-child(4){font-size:12vw;top:30%;right:-2%;transform:rotate(10deg)}.bg-logo:nth-child(5){font-size:20vw;bottom:-5%;left:20%;transform:rotate(-8deg)}
 .wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:30px 20px 90px}
-
-header{display:flex;align-items:center;gap:16px;margin-bottom:28px;padding:20px 26px;background:linear-gradient(135deg,rgba(255,107,0,.15),rgba(29,185,84,.1));border:1px solid rgba(255,107,0,.3);border-radius:20px;position:relative;overflow:hidden;z-index:1}
-header::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,107,0,.08),transparent 50%,rgba(29,185,84,.06));pointer-events:none}
+header{display:flex;align-items:center;gap:16px;margin-bottom:28px;padding:20px 26px;background:linear-gradient(135deg,rgba(255,107,0,.15),rgba(29,185,84,.1));border:1px solid rgba(255,107,0,.3);border-radius:20px;position:relative;overflow:hidden}
+header::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,107,0,.08),transparent 50%,rgba(29,185,84,.06))}
 .logo-box{width:64px;height:64px;border-radius:14px;background:linear-gradient(135deg,var(--orange),var(--ol));display:flex;align-items:center;justify-content:center;font-weight:900;z-index:1}
-.logo-box img{width:100%;height:100%;object-fit:contain;border-radius:14px}
-.htext{z-index:1}
-.htext h1{font-size:1.4rem;font-weight:800;background:linear-gradient(90deg,#fff 45%,var(--ol));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.htext p{font-size:.84rem;color:var(--muted)}
+.logo-box img{width:100%;height:100%;object-fit:contain;border-radius:14px}.htext{z-index:1}.htext h1{font-size:1.4rem;font-weight:800;background:linear-gradient(90deg,#fff 45%,var(--ol));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}.htext p{font-size:.84rem;color:var(--muted)}
 .badge{margin-left:auto;background:rgba(29,185,84,.15);border:1px solid rgba(29,185,84,.4);padding:5px 12px;border-radius:999px;color:var(--green);font-size:.72rem;font-weight:700;z-index:1}
-
-.tabs{display:flex;gap:8px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:5px;margin-bottom:20px;position:relative;z-index:50}
-.tab-btn{flex:1;border:none;padding:12px;background:transparent;color:var(--muted);border-radius:10px;font-weight:700;cursor:pointer;position:relative;z-index:51}
-.tab-btn.active{background:linear-gradient(135deg,var(--orange),var(--ol));color:#fff}
-.tab-btn.active.g{background:linear-gradient(135deg,var(--gd),var(--green));color:#fff}
-
-.panel{display:none;position:relative;z-index:1}
-.panel.active{display:block}
-
-.card{background:var(--sf);border:1px solid var(--border);border-radius:14px;padding:18px 20px;margin-bottom:12px;position:relative;overflow:hidden}
-.card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--orange),var(--ol))}
-.card.g::before{background:linear-gradient(180deg,var(--gd),var(--green))}
-.card.b::before{background:linear-gradient(180deg,#2a70c2,#4a90e2)}
-.card.w::before{background:linear-gradient(180deg,var(--warn),#ffd060)}
-
-.sh{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.sn{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--orange),var(--ol));font-weight:800;font-size:.8rem}
-.sn.g{background:linear-gradient(135deg,var(--gd),var(--green))}
-.sn.b{background:linear-gradient(135deg,#2a70c2,#4a90e2)}
-.st{font-size:1rem;font-weight:700}
+.tabs{display:flex;gap:8px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:5px;margin-bottom:20px}
+.tab-btn{flex:1;border:none;padding:12px;background:transparent;color:var(--muted);border-radius:10px;font-weight:700;cursor:pointer}.tab-btn.active{background:linear-gradient(135deg,var(--orange),var(--ol));color:#fff}.tab-btn.active.g{background:linear-gradient(135deg,var(--gd),var(--green))}
+.panel{display:none}.panel.active{display:block}
+.card{background:var(--sf);border:1px solid var(--border);border-radius:14px;padding:18px 20px;margin-bottom:12px;position:relative;overflow:hidden}.card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--orange),var(--ol))}.card.g::before{background:linear-gradient(180deg,var(--gd),var(--green))}.card.b::before{background:linear-gradient(180deg,#2a70c2,#4a90e2)}.card.w::before{background:linear-gradient(180deg,var(--warn),#ffd060)}
+.sh{display:flex;align-items:center;gap:10px;margin-bottom:8px}.sn{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--orange),var(--ol));font-weight:800;font-size:.8rem}.sn.g{background:linear-gradient(135deg,var(--gd),var(--green))}.sn.b{background:linear-gradient(135deg,#2a70c2,#4a90e2)}.st{font-size:1rem;font-weight:700}
 .hint{font-size:.8rem;color:#ffd7b3;background:rgba(255,107,0,.07);border:1px solid rgba(255,107,0,.2);border-radius:10px;padding:8px 10px}
-
-.drop{border:2px dashed rgba(255,107,0,.35);border-radius:12px;padding:28px 16px;text-align:center;background:rgba(255,107,0,.03);position:relative;margin-top:10px}
-.drop input{position:absolute;inset:0;opacity:0}
-.di{font-size:2rem}
-.dt{font-weight:700}
-.ds{font-size:.8rem;color:var(--muted)}
-.dlim{display:inline-block;margin-top:8px;padding:3px 10px;border-radius:999px;background:rgba(255,107,0,.12);border:1px solid rgba(255,107,0,.3);color:var(--ol);font-size:.72rem}
-
-.finfo{display:none;align-items:center;gap:10px;background:rgba(29,185,84,.08);border:1px solid rgba(29,185,84,.3);border-radius:10px;padding:10px;margin-top:10px}
-.finfo.show{display:flex}
-.fname{font-weight:700;font-size:.86rem}
-.fsize{font-size:.74rem;color:var(--muted)}
-.frem{margin-left:auto;background:rgba(255,59,59,.15);border:1px solid rgba(255,59,59,.3);color:#ff9b9b;padding:4px 9px;border-radius:8px;cursor:pointer}
-
-.btn{width:100%;border:none;border-radius:10px;padding:12px 14px;font-weight:700;cursor:pointer}
-.btn-o{background:linear-gradient(135deg,var(--orange),var(--ol));color:#fff}
-.btn-g{background:linear-gradient(135deg,var(--gd),var(--green));color:#fff}
-.btn-b{background:linear-gradient(135deg,#2a70c2,#4a90e2);color:#fff}
-.btn-w{background:linear-gradient(135deg,#c07000,var(--warn));color:#fff}
+.drop{border:2px dashed rgba(255,107,0,.35);border-radius:12px;padding:28px 16px;text-align:center;background:rgba(255,107,0,.03);position:relative;margin-top:10px}.drop input{position:absolute;inset:0;opacity:0}
+.di{font-size:2rem}.dt{font-weight:700}.ds{font-size:.8rem;color:var(--muted)}.dlim{display:inline-block;margin-top:8px;padding:3px 10px;border-radius:999px;background:rgba(255,107,0,.12);border:1px solid rgba(255,107,0,.3);color:var(--ol);font-size:.72rem}
+.finfo{display:none;align-items:center;gap:10px;background:rgba(29,185,84,.08);border:1px solid rgba(29,185,84,.3);border-radius:10px;padding:10px;margin-top:10px}.finfo.show{display:flex}
+.fname{font-weight:700;font-size:.86rem}.fsize{font-size:.74rem;color:var(--muted)}.frem{margin-left:auto;background:rgba(255,59,59,.15);border:1px solid rgba(255,59,59,.3);color:#ff9b9b;padding:4px 9px;border-radius:8px;cursor:pointer}
+.btn{width:100%;border:none;border-radius:10px;padding:12px 14px;font-weight:700;cursor:pointer}.btn-o{background:linear-gradient(135deg,var(--orange),var(--ol));color:#fff}.btn-g{background:linear-gradient(135deg,var(--gd),var(--green));color:#fff}.btn-b{background:linear-gradient(135deg,#2a70c2,#4a90e2);color:#fff}.btn-w{background:linear-gradient(135deg,#c07000,var(--warn));color:#fff}
 .btn-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}
-
-.src-sel{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-.src-opt{border:2px solid var(--border);border-radius:12px;padding:14px;display:flex;gap:10px;cursor:pointer;background:var(--sf)}
-.src-opt.active{border-color:var(--orange)}
-.src-panel{display:none}
-.src-panel.active{display:block}
-
-.url-row{display:flex;gap:8px;flex-wrap:wrap}
-.url-wrap{flex:1;min-width:220px;position:relative}
-.url-wrap input{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:10px;padding:11px 36px 11px 12px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.8rem}
-.url-clear{position:absolute;right:9px;top:50%;transform:translateY(-50%);display:none;background:none;border:none;color:var(--muted);cursor:pointer}
-.url-clear.show{display:block}
-
-.sgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}
-.sc{border:1px solid var(--border);border-radius:11px;padding:11px;text-align:center;background:var(--sf)}
-.sv{font-size:1.6rem;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--ol)}
-.sv.g{color:var(--green)}
-.sv.r{color:var(--err)}
-.sl{font-size:.66rem;color:var(--muted);text-transform:uppercase}
-
-.err-table,.warn-table,.prod-table{width:100%;border-collapse:collapse;margin-top:10px;font-size:.82rem}
-.err-table th,.warn-table th,.prod-table th{padding:8px 10px;text-align:left}
-.err-table th{background:rgba(255,59,59,.12);color:#ff9494}
-.warn-table th{background:rgba(255,184,0,.1);color:#ffd060}
-.prod-table th{background:rgba(74,144,226,.1);color:#9ecbff}
-.err-table td,.warn-table td,.prod-table td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.05)}
-
+.src-sel{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}.src-opt{border:2px solid var(--border);border-radius:12px;padding:14px;display:flex;gap:10px;cursor:pointer;background:var(--sf)}.src-opt.active{border-color:var(--orange)}
+.src-panel{display:none}.src-panel.active{display:block}.url-row{display:flex;gap:8px;flex-wrap:wrap}.url-wrap{flex:1;min-width:220px;position:relative}.url-wrap input{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:10px;padding:11px 36px 11px 12px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.8rem}.url-clear{position:absolute;right:9px;top:50%;transform:translateY(-50%);display:none}.url-clear.show{display:block}
+.sgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}.sc{border:1px solid var(--border);border-radius:11px;padding:11px;text-align:center;background:var(--sf)}.sv{font-size:1.6rem;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--ol)}.sv.g{color:var(--green)}.sv.r{color:var(--err)}.sl{font-size:.66rem;color:var(--muted);text-transform:uppercase}
+.err-table,.warn-table,.prod-table{width:100%;border-collapse:collapse;margin-top:10px;font-size:.82rem}.err-table th,.warn-table th,.prod-table th{padding:8px 10px;text-align:left}.err-table th{background:rgba(255,59,59,.12);color:#ff9494}.warn-table th{background:rgba(255,184,0,.1);color:#ffd060}.prod-table th{background:rgba(74,144,226,.1);color:#9ecbff}.err-table td,.warn-table td,.prod-table td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.05)}
 .rok{background:rgba(29,185,84,.1);border:1px solid rgba(29,185,84,.4);border-radius:10px;padding:12px;color:#67de83;font-weight:700}
 .rfail{background:rgba(255,59,59,.1);border:1px solid rgba(255,59,59,.3);border-radius:10px;padding:12px;color:#ff9b9b;font-weight:700}
-.xprev{display:none;background:rgba(0,0,0,.35);border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:8px;font-family:'JetBrains Mono',monospace;font-size:.72rem;max-height:220px;overflow:auto;white-space:pre-wrap;word-break:break-all}
-.xprev.show{display:block}
-.tprev{border:1px solid var(--border);background:none;color:var(--muted);padding:6px 11px;border-radius:8px;cursor:pointer;margin-top:8px}
-
+.xprev{display:none;background:rgba(0,0,0,.35);border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:8px;font-family:'JetBrains Mono',monospace;font-size:.72rem;max-height:220px;overflow:auto;white-space:pre-wrap;word-break:break-all}.xprev.show{display:block}.tprev{border:1px solid var(--border);background:none;color:var(--muted);padding:6px 11px;border-radius:8px;cursor:pointer;margin-top:8px}
 .div{height:1px;background:linear-gradient(90deg,transparent,var(--orange),var(--green),transparent);margin:18px 0;border:none}
-.prog{display:none;align-items:center;justify-content:center;gap:12px;padding:12px}
-.prog.show{display:flex}
-.ring{width:64px;height:64px;border-radius:50%;background:conic-gradient(var(--orange) var(--p,0%), rgba(255,255,255,.08) 0)}
-.pl{color:var(--muted);font-size:.84rem}
-
-.ps-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.ps-tools input,.ps-tools select{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:9px;padding:8px 10px;color:var(--text)}
-.vbtn{padding:8px 10px;border-radius:8px;border:1px solid rgba(74,144,226,.5);background:rgba(74,144,226,.2);color:#9cc8ff;cursor:pointer}
-.vbtn.act{background:linear-gradient(135deg,#2a70c2,#4a90e2);color:#fff}
-
-.pgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:10px}
-.pcard{border:1px solid var(--border);border-radius:11px;overflow:hidden;background:rgba(255,255,255,.03)}
-.pimg{width:100%;height:160px;object-fit:cover;background:rgba(255,255,255,.04)}
-.pbody{padding:9px}
-.pt{font-weight:700;font-size:.84rem;line-height:1.4;min-height:36px}
-.pm{font-size:.75rem;color:var(--muted);margin-top:4px}
-
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.68);display:none;align-items:center;justify-content:center;z-index:9999;padding:14px}
-.modal.show{display:flex}
-.modal-box{width:100%;max-width:920px;max-height:92vh;overflow:auto;background:#0b1118;border:1px solid var(--border);border-radius:12px;padding:14px}
+.prog{display:none;align-items:center;justify-content:center;gap:12px;padding:12px}.prog.show{display:flex}.ring{width:64px;height:64px;border-radius:50%;background:conic-gradient(var(--orange) var(--p,0%), rgba(255,255,255,.08) 0)}.pl{color:var(--muted);font-size:.84rem}
+.ps-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.ps-tools input,.ps-tools select{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:9px;padding:8px 10px;color:var(--text)}.vbtn{padding:8px 10px;border-radius:8px;border:1px solid rgba(74,144,226,.5);background:rgba(74,144,226,.2);color:#9cc8ff;cursor:pointer}.vbtn.act{background:linear-gradient(135deg,#2a70c2,#4a90e2);color:#fff}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:10px}.pcard{border:1px solid var(--border);border-radius:11px;overflow:hidden;background:rgba(255,255,255,.03)}.pimg{width:100%;height:160px;object-fit:cover;background:rgba(255,255,255,.04)}.pbody{padding:9px}.pt{font-weight:700;font-size:.84rem;line-height:1.4;min-height:36px}.pm{font-size:.75rem;color:var(--muted);margin-top:4px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.68);display:none;align-items:center;justify-content:center;z-index:9999;padding:14px}.modal.show{display:flex}.modal-box{width:100%;max-width:920px;max-height:92vh;overflow:auto;background:#0b1118;border:1px solid var(--border);border-radius:12px;padding:14px}
 footer{position:fixed;bottom:12px;right:18px;font-size:.69rem;color:rgba(255,255,255,.2)}
 </style>
 </head>
 <body>
 <div class="bg-layer"><div class="bg-g"></div><div class="bg-grid"></div><div class="bg-logo">EVA</div><div class="bg-logo">EVA</div><div class="bg-logo">EVA</div></div>
-
 <div class="wrap">
-<header>
-  <div class="logo-box"><img src="EVA_LOGO.png" alt="EVA" onerror="this.outerHTML='<span>EVA</span>'"/></div>
-  <div class="htext">
-    <h1>Валідація прайс листу та форматування</h1>
-    <p>Перевірка та конвертація прайс-листів для EVA Marketplace</p>
-  </div>
-  <div class="badge">● ONLINE</div>
-</header>
-
-<div class="tabs">
-  <button type="button" class="tab-btn active" data-tab="excel">📊 Excel → XML</button>
-  <button type="button" class="tab-btn" data-tab="valid">✅ Валідація XML</button>
-</div>
+<header><div class="logo-box"><img src="EVA_LOGO.png" alt="EVA" onerror="this.outerHTML='<span>EVA</span>'"/></div><div class="htext"><h1>Валідація прайс листу та форматування</h1><p>Перевірка та конвертація прайс-листів для EVA Marketplace</p></div><div class="badge">● ONLINE</div></header>
+<div class="tabs"><button class="tab-btn active" onclick="switchTab('excel')">📊 Excel → XML</button><button class="tab-btn" onclick="switchTab('valid')">✅ Валідація XML</button></div>
 
 <div class="panel active" id="panel-excel">
-  <div class="card w">
-    <div class="sh"><div class="sn">?</div><div class="st">Вимоги до Excel</div></div>
-    <div class="hint">Обов'язкові: Offer ID, Назва товару, Ціна, Валюта, ID Категорії, Бренд, Зображення, Опис, Наявність. Максимум файлу: 250 МБ.</div>
-  </div>
-
-  <div class="card">
-    <div class="sh"><div class="sn">1</div><div class="st">Завантажте ваш прайс-лист</div></div>
-    <div class="drop" id="excelDrop" ondragover="dov(event)" ondragleave="dol(event,'excelDrop')" ondrop="ddr(event,'excel')">
-      <input type="file" accept=".xlsx,.xls" onchange="hf(this,'excel')"/>
-      <div class="di">📂</div>
-      <div class="dt">Перетягніть файл сюди або натисніть</div>
-      <div class="ds">Excel .xlsx/.xls</div>
-      <span class="dlim">до 250 МБ</span>
-    </div>
-    <div class="finfo" id="efi">
-      <span>📄</span>
-      <div><div class="fname" id="efn">—</div><div class="fsize" id="efs">—</div></div>
-      <button class="frem" onclick="rmf('excel')">✕ Видалити</button>
-    </div>
-  </div>
-
-  <div class="card g" id="eStep2" style="display:none">
-    <div class="sh"><div class="sn g">2</div><div class="st">Конвертація у XML</div></div>
-    <div class="prog" id="eProg"><div class="ring" id="eRing"></div><div class="pl" id="ePl">Обробка...</div></div>
-    <button class="btn btn-o" onclick="convertExcel()">🔄 Конвертувати</button>
-  </div>
-
-  <div class="card b" id="eStep3" style="display:none">
-    <div class="sh"><div class="sn b">3</div><div class="st">Результат конвертації</div></div>
-    <div id="eMsg"></div>
-    <div class="btn-row" id="eDlRow" style="display:none">
-      <button class="btn btn-g" onclick="dlXml('excel')">⬇️ Завантажити XML</button>
-      <button class="btn btn-b" onclick="copyLink()">🔗 Скопіювати посилання</button>
-    </div>
-    <button class="tprev" onclick="tp('ePrev')">👁️ Переглянути XML</button>
-    <div class="xprev" id="ePrev"></div>
-  </div>
+  <div class="card w"><div class="sh"><div class="sn">?</div><div class="st">Вимоги до Excel</div></div><div class="hint">Обов'язкові: Offer ID, Назва товару, Ціна, Валюта, ID Категорії, Бренд, Зображення, Опис, Наявність. Максимум файлу: 250 МБ.</div></div>
+  <div class="card"><div class="sh"><div class="sn">1</div><div class="st">Завантажте ваш прайс-лист</div></div><div class="drop" id="excelDrop" ondragover="dov(event)" ondragleave="dol(event,'excelDrop')" ondrop="ddr(event,'excel')"><input type="file" accept=".xlsx,.xls" onchange="hf(this,'excel')"/><div class="di">📂</div><div class="dt">Перетягніть файл сюди або натисніть</div><div class="ds">Excel .xlsx/.xls</div><span class="dlim">до 250 МБ</span></div><div class="finfo" id="efi"><span>📄</span><div><div class="fname" id="efn">—</div><div class="fsize" id="efs">—</div></div><button class="frem" onclick="rmf('excel')">✕ Видалити</button></div></div>
+  <div class="card g" id="eStep2" style="display:none"><div class="sh"><div class="sn g">2</div><div class="st">Конвертація у XML</div></div><div class="prog" id="eProg"><div class="ring" id="eRing"></div><div class="pl" id="ePl">Обробка...</div></div><button class="btn btn-o" onclick="convertExcel()">🔄 Конвертувати</button></div>
+  <div class="card b" id="eStep3" style="display:none"><div class="sh"><div class="sn b">3</div><div class="st">Результат конвертації</div></div><div id="eMsg"></div><div class="btn-row" id="eDlRow" style="display:none"><button class="btn btn-g" onclick="dlXml('excel')">⬇️ Завантажити XML</button><button class="btn btn-b" onclick="copyLink()">🔗 Скопіювати посилання</button></div><button class="tprev" onclick="tp('ePrev')">👁️ Переглянути XML</button><div class="xprev" id="ePrev"></div></div>
 </div>
 
 <div class="panel" id="panel-valid">
-  <div class="card">
-    <div class="sh"><div class="sn">1</div><div class="st">Оберіть джерело XML</div></div>
-  </div>
-
-  <div class="src-sel">
-    <div class="src-opt active" id="sFile" onclick="ss('file')">
-      <div>📁</div>
-      <div><strong>XML Файл</strong><div class="pm">З комп'ютера</div></div>
-    </div>
-    <div class="src-opt" id="sUrl" onclick="ss('url')">
-      <div>🌐</div>
-      <div><strong>URL Посилання</strong><div class="pm">До 300 МБ</div></div>
-    </div>
-  </div>
-
-  <div class="src-panel active" id="sp-file">
-    <div class="drop" id="xmlDrop" ondragover="dov(event)" ondragleave="dol(event,'xmlDrop')" ondrop="ddr(event,'xml')">
-      <input type="file" accept=".xml" onchange="hf(this,'xml')"/>
-      <div class="di">📋</div>
-      <div class="dt">Перетягніть XML</div>
-      <span class="dlim">до 250 МБ</span>
-    </div>
-    <div class="finfo" id="vfi">
-      <span>📄</span>
-      <div><div class="fname" id="vfn">—</div><div class="fsize" id="vfs">—</div></div>
-      <button class="frem" onclick="rmf('xml')">✕ Видалити</button>
-    </div>
-  </div>
-
-  <div class="src-panel" id="sp-url">
-    <div class="card" style="margin-bottom:0">
-      <div class="url-row">
-        <div class="url-wrap">
-          <input type="text" id="urlIn" placeholder="https://example.com/feed.xml" oninput="urlTyped()"/>
-          <button type="button" class="url-clear" id="urlClr" onclick="clearUrl()">✕</button>
-        </div>
-        <button class="btn btn-o" style="width:auto;padding:11px 16px" onclick="loadUrl()">🔍 Перевірити</button>
-      </div>
-      <div id="urlSt" class="pm" style="margin-top:8px"></div>
-    </div>
-  </div>
-
+  <div class="card"><div class="sh"><div class="sn">1</div><div class="st">Оберіть джерело XML</div></div></div>
+  <div class="src-sel"><div class="src-opt active" id="sFile" onclick="ss('file')"><div>📁</div><div><strong>XML Файл</strong><div class="pm">З комп'ютера</div></div></div><div class="src-opt" id="sUrl" onclick="ss('url')"><div>🌐</div><div><strong>URL Посилання</strong><div class="pm">До 300 МБ</div></div></div></div>
+  <div class="src-panel active" id="sp-file"><div class="drop" id="xmlDrop" ondragover="dov(event)" ondragleave="dol(event,'xmlDrop')" ondrop="ddr(event,'xml')"><input type="file" accept=".xml" onchange="hf(this,'xml')"/><div class="di">📋</div><div class="dt">Перетягніть XML</div><span class="dlim">до 250 МБ</span></div><div class="finfo" id="vfi"><span>📄</span><div><div class="fname" id="vfn">—</div><div class="fsize" id="vfs">—</div></div><button class="frem" onclick="rmf('xml')">✕ Видалити</button></div></div>
+  <div class="src-panel" id="sp-url"><div class="card" style="margin-bottom:0"><div class="url-row"><div class="url-wrap"><input type="text" id="urlIn" placeholder="https://example.com/feed.xml" oninput="urlTyped()"/><button class="url-clear" id="urlClr" onclick="clearUrl()">✕</button></div><button class="btn btn-o" style="width:auto;padding:11px 16px" onclick="loadUrl()">📥 Завантажити</button></div><div id="urlSt" class="pm" style="margin-top:8px"></div></div></div>
   <hr class="div"/>
-
-  <div class="card g" id="vStep2" style="display:none">
-    <div class="sh"><div class="sn g">2</div><div class="st">Перевірка XML на вимоги EVA</div></div>
-    <button class="tprev" onclick="tp('vPrev')">👁️ Переглянути XML</button>
-    <div class="xprev" id="vPrev"></div>
-    <div class="prog" id="vProg"><div class="ring" id="vRing"></div><div class="pl" id="vPl">Перевірка...</div></div>
-    <button class="btn btn-o" onclick="validateXml()">🔍 Перевірити XML</button>
-  </div>
-
-  <div class="card" id="vStep3" style="display:none">
-    <div class="sh"><div class="sn g">3</div><div class="st">Результати перевірки</div></div>
-    <div class="sgrid">
-      <div class="sc"><div class="sv" id="vT">0</div><div class="sl">Офферів</div></div>
-      <div class="sc"><div class="sv g" id="vV">0</div><div class="sl">Валідних</div></div>
-      <div class="sc"><div class="sv r" id="vI">0</div><div class="sl">З помилками</div></div>
-      <div class="sc"><div class="sv" id="vC">0</div><div class="sl">Категорій</div></div>
-    </div>
-    <div id="vMsg"></div>
-    <div id="errSumWrap" style="display:none"><table class="err-table"><thead><tr><th>Тип помилки</th><th>Кількість</th></tr></thead><tbody id="errSum"></tbody></table></div>
-    <div id="warnSumWrap" style="display:none"><table class="warn-table"><thead><tr><th>Попередження</th><th>Кількість</th></tr></thead><tbody id="warnSum"></tbody></table></div>
-    <div class="btn-row">
-      <button class="btn btn-g" onclick="dlXml('valid')">⬇️ Завантажити XML</button>
-      <button class="btn btn-w" onclick="dlErrReport()">📥 Звіт помилок (.xlsx)</button>
-    </div>
-  </div>
-
-  <div class="card b" id="vProducts" style="display:none">
-    <div class="sh"><div class="sn b">4</div><div class="st">Товари прайс-листа</div></div>
-    <div class="ps-tools">
-      <input id="pSearch" placeholder="Пошук ID/назва/бренд..." oninput="applyProductFilters()"/>
-      <select id="pStatus" onchange="applyProductFilters()">
-        <option value="all">Всі</option>
-        <option value="valid">Валідні</option>
-        <option value="invalid">З помилками</option>
-      </select>
-      <select id="pCat" onchange="applyProductFilters()"><option value="all">Всі категорії</option></select>
-      <button class="vbtn act" id="vTableBtn" onclick="setProductView('table')">Таблиця</button>
-      <button class="vbtn" id="vCardBtn" onclick="setProductView('cards')">Картки</button>
-    </div>
-    <div id="pTableWrap">
-      <table class="prod-table">
-        <thead><tr><th>ID</th><th>Назва</th><th>Категорія</th><th>Ціна</th><th>Статус</th><th></th></tr></thead>
-        <tbody id="pBody"></tbody>
-      </table>
-    </div>
-    <div id="pCards" class="pgrid" style="display:none"></div>
-    <div class="btn-row">
-      <button class="btn btn-b" onclick="chgPage(-1)">◀ Попередня</button>
-      <button class="btn btn-b" onclick="chgPage(1)">Наступна ▶</button>
-    </div>
-    <div id="pPage" class="pm" style="text-align:center">1/1</div>
-  </div>
-
-  <div class="card w" id="vStruct" style="display:none">
-    <div class="sh"><div class="sn">5</div><div class="st">Аналіз структури XML</div></div>
-    <table class="prod-table"><thead><tr><th>Атрибут offer</th><th>Кількість</th></tr></thead><tbody id="attrBody"></tbody></table>
-    <table class="warn-table"><thead><tr><th>param name</th><th>Кількість</th></tr></thead><tbody id="paramBody"></tbody></table>
-  </div>
+  <div class="card g" id="vStep2" style="display:none"><div class="sh"><div class="sn g">2</div><div class="st">Перевірка XML на вимоги EVA</div></div><button class="tprev" onclick="tp('vPrev')">👁️ Переглянути XML</button><div class="xprev" id="vPrev"></div><div class="prog" id="vProg"><div class="ring" id="vRing"></div><div class="pl" id="vPl">Перевірка...</div></div><button class="btn btn-o" onclick="validateXml()">🔍 Перевірити XML</button></div>
+  <div class="card" id="vStep3" style="display:none"><div class="sh"><div class="sn g">3</div><div class="st">Результати перевірки</div></div><div class="sgrid"><div class="sc"><div class="sv" id="vT">0</div><div class="sl">Офферів</div></div><div class="sc"><div class="sv g" id="vV">0</div><div class="sl">Валідних</div></div><div class="sc"><div class="sv r" id="vI">0</div><div class="sl">З помилками</div></div><div class="sc"><div class="sv" id="vC">0</div><div class="sl">Категорій</div></div></div><div id="vMsg"></div><div id="errSumWrap" style="display:none"><table class="err-table"><thead><tr><th>Тип помилки</th><th>Кількість</th></tr></thead><tbody id="errSum"></tbody></table></div><div id="warnSumWrap" style="display:none"><table class="warn-table"><thead><tr><th>Попередження</th><th>Кількість</th></tr></thead><tbody id="warnSum"></tbody></table></div><div class="btn-row"><button class="btn btn-g" onclick="dlXml('valid')">⬇️ Завантажити XML</button><button class="btn btn-w" onclick="dlErrReport()">📥 Звіт помилок (.xlsx)</button></div></div>
+  <div class="card b" id="vProducts" style="display:none"><div class="sh"><div class="sn b">4</div><div class="st">Товари прайс-листа</div></div><div class="ps-tools"><input id="pSearch" placeholder="Пошук ID/назва/бренд..." oninput="applyProductFilters()"/><select id="pStatus" onchange="applyProductFilters()"><option value="all">Всі</option><option value="valid">Валідні</option><option value="invalid">З помилками</option></select><select id="pCat" onchange="applyProductFilters()"><option value="all">Всі категорії</option></select><button class="vbtn act" id="vTableBtn" onclick="setProductView('table')">Таблиця</button><button class="vbtn" id="vCardBtn" onclick="setProductView('cards')">Картки</button></div><div id="pTableWrap"><table class="prod-table"><thead><tr><th>ID</th><th>Назва</th><th>Категорія</th><th>Ціна</th><th>Статус</th><th></th></tr></thead><tbody id="pBody"></tbody></table></div><div id="pCards" class="pgrid" style="display:none"></div><div class="btn-row"><button class="btn btn-b" onclick="chgPage(-1)">◀ Попередня</button><button class="btn btn-b" onclick="chgPage(1)">Наступна ▶</button></div><div id="pPage" class="pm" style="text-align:center">1/1</div></div>
+  <div class="card w" id="vStruct" style="display:none"><div class="sh"><div class="sn">5</div><div class="st">Аналіз структури XML</div></div><table class="prod-table"><thead><tr><th>Атрибут offer</th><th>Кількість</th></tr></thead><tbody id="attrBody"></tbody></table><table class="warn-table"><thead><tr><th>param name</th><th>Кількість</th></tr></thead><tbody id="paramBody"></tbody></table></div>
 </div>
-
+</div>
 <div class="modal" id="pmodal" onclick="closeModal(event)"><div class="modal-box" id="mbox"></div></div>
 <footer>Розробник: Кіріл Дубінецький</footer>
-
 <script>
 let eData=null,xmlCnt=null,xmlRes=null,eErrRows=[],prodRows=[],prodFiltered=[],pPage=1,pSize=10,pView='table',attrMap={},paramMap={}
+const MAX_URL_XML=300*1024*1024
 const WORKER_PROXY_URL='https://eva-validator.ppioltd.workers.dev/'
 const esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
 const cv=v=>(v===null||v===undefined||v!==v)?'':String(v).trim()
 const fb=b=>b<1048576?(b/1024).toFixed(1)+' КБ':(b/1048576).toFixed(1)+' МБ'
-
-function bindTabs(){
-  document.querySelectorAll('.tab-btn[data-tab]').forEach(btn=>{
-    btn.addEventListener('click',()=>switchTab(btn.dataset.tab))
-  })
-}
-function switchTab(n){
-  document.querySelectorAll('.tab-btn').forEach(btn=>btn.classList.remove('active','g'))
-  document.querySelectorAll('.panel').forEach(panel=>panel.classList.remove('active'))
-  const targetBtn=document.querySelector(`.tab-btn[data-tab="${n}"]`)
-  const targetPanel=document.getElementById(`panel-${n}`)
-  if(targetBtn){
-    targetBtn.classList.add('active')
-    if(n==='valid') targetBtn.classList.add('g')
-  }
-  if(targetPanel) targetPanel.classList.add('active')
-}
-
-function ss(src){
-  ['file','url'].forEach(s=>{
-    document.getElementById('s'+s.charAt(0).toUpperCase()+s.slice(1)).classList.toggle('active',s===src)
-    document.getElementById('sp-'+s).classList.toggle('active',s===src)
-  })
-  document.getElementById('vStep2').style.display=src==='file'&&xmlCnt?'block':'none'
-}
-
-function dov(e){e.preventDefault();e.currentTarget.classList.add('over')}
-function dol(e,id){document.getElementById(id).classList.remove('over')}
+function switchTab(n){document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active','g'));document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));const btn=document.querySelector(`.tab-btn:nth-child(${n==='excel'?1:2})`);btn.classList.add('active');if(n==='valid')btn.classList.add('g');document.getElementById('panel-'+n).classList.add('active')}
+function ss(src){['file','url'].forEach(s=>{document.getElementById('s'+s.charAt(0).toUpperCase()+s.slice(1)).classList.toggle('active',s===src);document.getElementById('sp-'+s).classList.toggle('active',s===src)})}
+function dov(e){e.preventDefault();e.currentTarget.classList.add('over')}function dol(e,id){document.getElementById(id).classList.remove('over')}
 function ddr(e,t){e.preventDefault();e.currentTarget.classList.remove('over');const f=e.dataTransfer.files[0];if(f)pf(f,t)}
-function hf(inp,t){if(inp.files[0])pf(inp.files[0],t)}
-function tp(id){document.getElementById(id).classList.toggle('show')}
+function hf(inp,t){if(inp.files[0])pf(inp.files[0],t)}function tp(id){document.getElementById(id).classList.toggle('show')}
 function setProg(id,val){document.getElementById(id).style.setProperty('--p',`${val}%`)}
 function animateProg(wrap,ring,label,ms,text,done){const w=document.getElementById(wrap);w.classList.add('show');document.getElementById(label).textContent=text;let s=null;(function step(ts){if(!s)s=ts;const p=Math.min(100,((ts-s)/ms)*100);setProg(ring,p);if(p<100)requestAnimationFrame(step);else{w.classList.remove('show');done&&done()}})(performance.now())}
-
-function getFirstByTag(root, tag){const list=root.getElementsByTagName(tag);return list.length?list[0]:null}
-function getChildrenByTag(node, tag){return Array.from(node.getElementsByTagName(tag))}
-function getDirectChildrenByTag(node, tag){return Array.from(node.children || []).filter(el => (el.localName || el.tagName || '').toLowerCase() === tag.toLowerCase())}
-function getNodeText(parent, tag){const el=getFirstByTag(parent, tag);return cv(el && el.textContent)}
-function getXmlRootError(doc){const errs=doc.getElementsByTagName('parsererror');return errs.length ? errs[0] : null}
-
-function detectCharset(contentType, sampleText){
-  const ct=(contentType||'').toLowerCase()
-  const ctMatch=ct.match(/charset\s*=\s*["']?\s*([^;"'\s]+)/i)
-  if(ctMatch&&ctMatch[1]) return ctMatch[1].toLowerCase()
-  const xmlMatch=(sampleText||'').match(/<\?xml[^>]*encoding\s*=\s*["']([^"']+)["']/i)
-  if(xmlMatch&&xmlMatch[1]) return xmlMatch[1].toLowerCase()
-  return 'utf-8'
-}
-function normalizeCharset(charset){
-  const map={'utf8':'utf-8','utf-8':'utf-8','cp1251':'windows-1251','windows-1251':'windows-1251','win-1251':'windows-1251','1251':'windows-1251','cp1252':'windows-1252','windows-1252':'windows-1252','iso-8859-1':'iso-8859-1','koi8-r':'koi8-r'}
-  return map[(charset||'').toLowerCase()]||charset||'utf-8'
-}
-function decodeXmlBuffer(arrayBuffer, contentType){
-  const bytes=new Uint8Array(arrayBuffer)
-  const asciiSample=new TextDecoder('ascii').decode(bytes.slice(0,4096))
-  let charset=normalizeCharset(detectCharset(contentType, asciiSample))
-  let text=''
-  try{text=new TextDecoder(charset).decode(bytes)}catch{charset='utf-8';text=new TextDecoder('utf-8').decode(bytes)}
-  return { text, charset }
-}
-
-function pf(file,t){
-  if(file.size>250*1024*1024){alert('Файл перевищує 250 МБ!');return}
-  if(t==='excel'){
-    document.getElementById('efn').textContent=file.name
-    document.getElementById('efs').textContent=fb(file.size)
-    document.getElementById('efi').classList.add('show')
-    document.getElementById('eStep2').style.display='block'
-    const r=new FileReader()
-    r.onload=e=>{const wb=XLSX.read(e.target.result,{type:'array'});const ws=wb.Sheets[wb.SheetNames[0]];eData=XLSX.utils.sheet_to_json(ws,{defval:''})}
-    r.readAsArrayBuffer(file)
-  }else{
-    document.getElementById('vfn').textContent=file.name
-    document.getElementById('vfs').textContent=fb(file.size)
-    document.getElementById('vfi').classList.add('show')
-    const r=new FileReader()
-    r.onload=e=>{
-      const { text } = decodeXmlBuffer(e.target.result, file.type || 'application/xml')
-      xmlCnt=text
-      document.getElementById('vStep2').style.display='block'
-      document.getElementById('vPrev').textContent=xmlCnt.substring(0,2000)+(xmlCnt.length>2000?'\n...':'')
-    }
-    r.readAsArrayBuffer(file)
-  }
-}
-
-function rmf(t){
-  if(t==='excel'){
-    eData=null;xmlRes=null
-    document.getElementById('efi').classList.remove('show')
-    document.getElementById('eStep2').style.display='none'
-    document.getElementById('eStep3').style.display='none'
-  }else{
-    xmlCnt=null;prodRows=[];prodFiltered=[]
-    document.getElementById('vfi').classList.remove('show')
-    document.getElementById('vStep2').style.display='none'
-    document.getElementById('vStep3').style.display='none'
-    document.getElementById('vProducts').style.display='none'
-    document.getElementById('vStruct').style.display='none'
-  }
-}
-
-function urlTyped(){document.getElementById('urlClr').classList.toggle('show',document.getElementById('urlIn').value.length>0)}
-function clearUrl(){document.getElementById('urlIn').value='';document.getElementById('urlClr').classList.remove('show');document.getElementById('urlSt').textContent='';xmlCnt=null}
+function pf(file,t){if(file.size>250*1024*1024){alert('Файл перевищує 250 МБ!');return}
+if(t==='excel'){document.getElementById('efn').textContent=file.name;document.getElementById('efs').textContent=fb(file.size);document.getElementById('efi').classList.add('show');document.getElementById('eStep2').style.display='block';const r=new FileReader();r.onload=e=>{const wb=XLSX.read(e.target.result,{type:'array'});const ws=wb.Sheets[wb.SheetNames[0]];eData=XLSX.utils.sheet_to_json(ws,{defval:''})};r.readAsArrayBuffer(file)}
+else{document.getElementById('vfn').textContent=file.name;document.getElementById('vfs').textContent=fb(file.size);document.getElementById('vfi').classList.add('show');const r=new FileReader();r.onload=e=>{xmlCnt=e.target.result;document.getElementById('vStep2').style.display='block';document.getElementById('vPrev').textContent=xmlCnt.substring(0,2000)+(xmlCnt.length>2000?'\n...':'')};r.readAsText(file,'UTF-8')}}
+function rmf(t){if(t==='excel'){eData=null;xmlRes=null;document.getElementById('efi').classList.remove('show');document.getElementById('eStep2').style.display='none';document.getElementById('eStep3').style.display='none'}else{xmlCnt=null;document.getElementById('vfi').classList.remove('show');document.getElementById('vStep2').style.display='none';document.getElementById('vStep3').style.display='none';document.getElementById('vProducts').style.display='none';document.getElementById('vStruct').style.display='none'}}
+function urlTyped(){document.getElementById('urlClr').classList.toggle('show',document.getElementById('urlIn').value.length>0)}function clearUrl(){document.getElementById('urlIn').value='';document.getElementById('urlClr').classList.remove('show');document.getElementById('urlSt').textContent='';xmlCnt=null}
 
 async function loadUrl(){
   let url=document.getElementById('urlIn').value.trim()
   if(!url){alert('Вставте URL!');return}
   if(!url.startsWith('http'))url='https://'+url
-
   const st=document.getElementById('urlSt')
   st.style.color='var(--muted)'
-  st.textContent='⏳ Стартую перевірку через Worker...'
-
+  st.textContent='⏳ Завантажую через Cloudflare Worker...'
   try{
-    // 1) start job
-    const startRes=await fetch(`${WORKER_PROXY_URL}api/start`,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({url})
-    })
-    const startData=await startRes.json()
-    if(!startRes.ok) throw new Error(startData.error||`HTTP ${startRes.status}`)
-
-    const id=startData.id
-    if(!id) throw new Error('Worker не повернув id')
-
-    // 2) poll status
-    const t0=Date.now()
-    while(true){
-      if(Date.now()-t0>10*60*1000) throw new Error('Таймаут очікування (10 хв).')
-
-      await new Promise(r=>setTimeout(r,1500))
-      const statusRes=await fetch(`${WORKER_PROXY_URL}api/status?id=${encodeURIComponent(id)}`)
-      const statusData=await statusRes.json()
-      if(!statusRes.ok) throw new Error(statusData.error||`HTTP ${statusRes.status}`)
-
-      const state=statusData?.status?.state
-      const bytes=statusData?.progress?.bytes||0
-      const offers=statusData?.progress?.offers||0
-
-      st.style.color='var(--muted)'
-      st.textContent=`⏳ Перевірка... offers: ${offers}, bytes: ${fb(bytes)}`
-
-      if(state==='done') break
-      if(state==='error') throw new Error(statusData?.status?.error||'Worker error')
+    const endpoint=`${WORKER_PROXY_URL}?url=${encodeURIComponent(url)}`
+    const r=await fetch(endpoint,{method:'GET'})
+    if(!r.ok){
+      const errText=await r.text()
+      throw new Error(errText||`HTTP ${r.status}`)
     }
-
-    // 3) fetch result
-    const resultRes=await fetch(`${WORKER_PROXY_URL}api/result?id=${encodeURIComponent(id)}`)
-    const resultData=await resultRes.json()
-    if(!resultRes.ok) throw new Error(resultData.error||`HTTP ${resultRes.status}`)
-
-    renderWorkerValidationResult(resultData)
+    const b=await r.blob()
+    if(b.size>MAX_URL_XML){
+      st.style.color='var(--err)'
+      st.textContent='❌ XML через URL перевищує 300 МБ.'
+      return
+    }
+    const t=await b.text()
+    if(!t.trim().startsWith('<'))throw new Error('Отримано не XML')
+    xmlCnt=t
     st.style.color='var(--green)'
-    st.textContent=`✅ Готово (${resultData.sourceCharset||'utf-8'}, ${fb(resultData.sourceBytes||0)})`
-    document.getElementById('vStep2').style.display='none'
+    st.textContent='✅ XML завантажено через Worker'
+    document.getElementById('vStep2').style.display='block'
+    document.getElementById('vPrev').textContent=xmlCnt.substring(0,2000)+(xmlCnt.length>2000?'\n...':'')
   }catch(e){
     st.style.color='var(--err)'
-    st.textContent='❌ Не вдалося перевірити XML через Worker: '+(e.message||'unknown error')
+    st.textContent='❌ Не вдалося завантажити XML через Worker: '+(e.message||'unknown error')
   }
 }
 
-function buildXml(data){
-  const now=new Date().toISOString().slice(0,16).replace('T',' ')
-  const cats={},offers=[],errors=[]
-  data.forEach((row,i)=>{
-    const oid=cv(row['Offer ID']),nua=cv(row['Название (украинский)']),price=cv(row['Цена']),cid=cv(row['ID Категории']),vendor=cv(row['Бренд']),dua=cv(row['Описание (украинский)']),imgs=cv(row['Изображения'])
-    if(!oid||!nua||!price||!cid||!vendor||!dua||!imgs){errors.push({row:i+2,id:oid||'—',name:nua||'—',errors:"неповні обов'язкові поля"});return}
-    if(!cats[cid])cats[cid]=cv(row['Категория'])
-    const pics=imgs.split(',').slice(0,15).map(u=>u.trim()).filter(Boolean).map(u=>`    <picture><![CDATA[${u}]]></picture>`).join('\n')
-    let o=`  <offer id="${esc(oid)}" available="true">\n    <price>${esc(price)}</price>\n    <stock_quantity>${esc(cv(row['Количество'])||'0')}</stock_quantity>\n    <currencyId>${esc(cv(row['Валюта'])||'UAH')}</currencyId>\n    <categoryId>${esc(cid)}</categoryId>\n${pics}\n    <vendor>${esc(vendor)}</vendor>\n    <name_ua><![CDATA[${nua}]]></name_ua>\n    <description_ua><![CDATA[${dua}]]></description_ua>\n`
-    for(let k=0;k<=24;k++){const s=k?'.'+k:'';const ch=cv(row['Характеристика'+s]),va=cv(row['Значение'+s]);if(ch&&va)o+=`    <param name="${esc(ch)}">${esc(va)}</param>\n`}
-    o+='  </offer>'
-    offers.push(o)
-  })
-  const cxml=Object.entries(cats).map(([id,n])=>`    <category id="${esc(id)}">${esc(n)}</category>`).join('\n')
-  return{xml:`<?xml version="1.0" encoding="UTF-8"?>\n<yml_catalog date="${now}">\n  <shop>\n    <name>EVA</name>\n    <company>EVA</company>\n    <url>https://eva.ua/</url>\n    <currencies>\n      <currency id="UAH" rate="1"/>\n      <currency id="USD" rate="44"/>\n      <currency id="EUR" rate="50"/>\n    </currencies>\n    <categories>\n${cxml}\n    </categories>\n    <offers>\n${offers.join('\n')}\n    </offers>\n  </shop>\n</yml_catalog>`,errors}
-}
-
-function convertExcel(){
-  if(!eData){alert('Завантажте Excel файл');return}
-  animateProg('eProg','eRing','ePl',Math.max(700,eData.length*3),'Конвертація...',()=>{
-    const r=buildXml(eData)
-    xmlRes=r.xml
-    eErrRows=r.errors
-    document.getElementById('eStep3').style.display='block'
-    const cnt=(r.xml.match(/<offer /g)||[]).length
-    document.getElementById('eMsg').innerHTML=cnt?`<div class="rok">🎉 Готово! Сформовано ${cnt} товарів. Пропущено: ${r.errors.length}.</div>`:`<div class="rfail">⛔ Не сформовано жодного товару.</div>`
-    document.getElementById('eDlRow').style.display=cnt?'grid':'none'
-    document.getElementById('ePrev').textContent=r.xml.substring(0,3000)+(r.xml.length>3000?'\n...':'')
-  })
-}
-
+function buildXml(data){const now=new Date().toISOString().slice(0,16).replace('T',' '),cats={},offers=[],errors=[];data.forEach((row,i)=>{const oid=cv(row['Offer ID']),nua=cv(row['Название (украинский)']),price=cv(row['Цена']),cid=cv(row['ID Категории']),vendor=cv(row['Бренд']),dua=cv(row['Описание (украинский)']),imgs=cv(row['Изображения']);if(!oid||!nua||!price||!cid||!vendor||!dua||!imgs){errors.push({row:i+2,id:oid||'—',name:nua||'—',errors:'неповні обов\'язкові поля'});return}if(!cats[cid])cats[cid]=cv(row['Категория']);const pics=imgs.split(',').slice(0,15).map(u=>u.trim()).filter(Boolean).map(u=>`    <picture><![CDATA[${u}]]></picture>`).join('\n');let o=`  <offer id="${esc(oid)}" available="true">\n    <price>${esc(price)}</price>\n    <stock_quantity>${esc(cv(row['Количество'])||'0')}</stock_quantity>\n    <currencyId>${esc(cv(row['Валюта'])||'UAH')}</currencyId>\n    <categoryId>${esc(cid)}</categoryId>\n${pics}\n    <vendor>${esc(vendor)}</vendor>\n    <name_ua><![CDATA[${nua}]]></name_ua>\n    <description_ua><![CDATA[${dua}]]></description_ua>\n`;for(let k=0;k<=24;k++){const s=k?'.'+k:'';const ch=cv(row['Характеристика'+s]),va=cv(row['Значение'+s]);if(ch&&va)o+=`    <param name="${esc(ch)}">${esc(va)}</param>\n`}o+='  </offer>';offers.push(o)});const cxml=Object.entries(cats).map(([id,n])=>`    <category id="${esc(id)}">${esc(n)}</category>`).join('\n');return{xml:`<?xml version="1.0" encoding="UTF-8"?>\n<yml_catalog date="${now}">\n  <shop>\n    <name>EVA</name>\n    <company>EVA</company>\n    <url>https://eva.ua/</url>\n    <currencies>\n      <currency id="UAH" rate="1"/>\n      <currency id="USD" rate="44"/>\n      <currency id="EUR" rate="50"/>\n    </currencies>\n    <categories>\n${cxml}\n    </categories>\n    <offers>\n${offers.join('\n')}\n    </offers>\n  </shop>\n</yml_catalog>`,errors}}
+function convertExcel(){if(!eData){alert('Завантажте Excel файл');return}animateProg('eProg','eRing','ePl',Math.max(700,eData.length*3),'Конвертація...',()=>{const r=buildXml(eData);xmlRes=r.xml;eErrRows=r.errors;document.getElementById('eStep3').style.display='block';const cnt=(r.xml.match(/<offer /g)||[]).length;document.getElementById('eMsg').innerHTML=cnt?`<div class="rok">🎉 Готово! Сформовано ${cnt} товарів. Пропущено: ${r.errors.length}.</div>`:`<div class="rfail">⛔ Не сформовано жодного товару.</div>`;document.getElementById('eDlRow').style.display=cnt?'grid':'none';document.getElementById('ePrev').textContent=r.xml.substring(0,3000)+(r.xml.length>3000?'\n...':'')})}
 function doVal(c){
-  if(/[\x00-\x08\x0B\x0C\x0E-\x1F]/.test(c)) return{errCounts:{'Недруковані ASCII символи в XML':1},warnCounts:{},products:[],attrCounts:{},paramCounts:{},total:0,valid:0,invalid:0,cats:0,errCount:1,warnCount:0}
-  const doc=new DOMParser().parseFromString(c,'application/xml')
+  if(/[\x00-\x08\x0B\x0C\x0E-\x1F]/.test(c)){
+    return{errCounts:{'Недруковані ASCII символи в XML':1},warnCounts:{},products:[],attrCounts:{},paramCounts:{},total:0,valid:0,invalid:0,cats:0,errCount:1,warnCount:0}
+  }
+  const doc=new DOMParser().parseFromString(c,'text/xml')
   const errCounts={},warnCounts={},products=[],attrCounts={},paramCounts={}
-  let total=0,valid=0,invalid=0,errCount=0,warnCount=0
-  if(getXmlRootError(doc)) return{errCounts:{'XML не валідний':1},warnCounts,products,attrCounts,paramCounts,total:0,valid:0,invalid:0,cats:0,errCount:1,warnCount:0}
-  const shop=getFirstByTag(doc,'shop')
-  if(!shop) return{errCounts:{'Відсутній тег shop':1},warnCounts,products,attrCounts,paramCounts,total:0,valid:0,invalid:0,cats:0,errCount:1,warnCount:0}
-  const yml=getFirstByTag(doc,'yml_catalog')
-  const date=(yml && yml.getAttribute('date')) || ''
-  const categoriesNode=getFirstByTag(shop,'categories')
-  const offersNode=getFirstByTag(shop,'offers')
-  const categoryNodes=categoriesNode ? getDirectChildrenByTag(categoriesNode,'category') : []
-  const offerNodes=offersNode ? getDirectChildrenByTag(offersNode,'offer') : []
-  const cats=categoryNodes.length
-  const ids=new Set(),names=new Set()
+  let total=0,valid=0,invalid=0,cats=doc.querySelectorAll('categories category').length,errCount=0,warnCount=0
+  if(doc.querySelector('parsererror'))return{errCounts:{'XML не валідний':1},warnCounts,products,attrCounts,paramCounts,total:0,valid:0,invalid:0,cats:0,errCount:1,warnCount:0}
+  if(!doc.querySelector('shop'))return{errCounts:{'Відсутній тег shop':1},warnCounts,products,attrCounts,paramCounts,total:0,valid:0,invalid:0,cats:0,errCount:1,warnCount:0}
 
-  offerNodes.forEach(o=>{
+  const date=(doc.querySelector('yml_catalog')&&doc.querySelector('yml_catalog').getAttribute('date'))||''
+  const ids=new Set(),names=new Set()
+  doc.querySelectorAll('shop offers offer').forEach(o=>{
     total++
     const e=[],w=[]
     const id=o.getAttribute('id')||'—'
-    const nameUa=getNodeText(o,'name_ua')
-    const nameRu=getNodeText(o,'name')
-    const vendor=getNodeText(o,'vendor')
-    const categoryId=getNodeText(o,'categoryId')||'—'
-    const price=getNodeText(o,'price')
-    const old=getNodeText(o,'price_old') || getNodeText(o,'old_price')
-    const currency=getNodeText(o,'currencyId')
-    const pics=getChildrenByTag(o,'picture').map(x=>cv(x.textContent)).filter(Boolean)
-    const dUa=getNodeText(o,'description_ua')
-    const params=getChildrenByTag(o,'param').map(p=>({name:cv(p.getAttribute('name')),value:cv(p.textContent)}))
+    const nameUa=cv(o.querySelector('name_ua')&&o.querySelector('name_ua').textContent)
+    const nameRu=cv(o.querySelector('name')&&o.querySelector('name').textContent)
+    const vendor=cv(o.querySelector('vendor')&&o.querySelector('vendor').textContent)
+    const categoryId=cv(o.querySelector('categoryId')&&o.querySelector('categoryId').textContent)||'—'
+    const price=cv(o.querySelector('price')&&o.querySelector('price').textContent)
+    const old=cv((o.querySelector('price_old')&&o.querySelector('price_old').textContent)||(o.querySelector('old_price')&&o.querySelector('old_price').textContent))
+    const currency=cv(o.querySelector('currencyId')&&o.querySelector('currencyId').textContent)
+    const pics=[].slice.call(o.querySelectorAll('picture')).map(x=>cv(x.textContent)).filter(Boolean)
+    const dUa=cv(o.querySelector('description_ua')&&o.querySelector('description_ua').textContent)
+    const params=[].slice.call(o.querySelectorAll('param')).map(p=>({name:cv(p.getAttribute('name')),value:cv(p.textContent)}))
+
     if(!/^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}$/.test(date))e.push('некоректний yml_catalog@date')
     if(!id||id==='—')e.push('немає id');else if(ids.has(id))e.push('дублікат id');else ids.add(id)
     if(!nameUa)e.push('немає name_ua')
@@ -538,95 +170,34 @@ function doVal(c){
     if(!pics.length)e.push('немає picture')
     if(pics.length>15)e.push('понад 15 picture')
     if(pics.some(u=>u.length>1999||/\s/.test(u)||/[А-Яа-яІіЇїЄєҐґ]/.test(u)))e.push('некоректний picture URL')
-    if(!getFirstByTag(o,'stock_quantity')&&!getFirstByTag(o,'quantity_in_stock'))e.push('немає stock_quantity/quantity_in_stock')
+    if(!o.querySelector('stock_quantity')&&!o.querySelector('quantity_in_stock'))e.push('немає stock_quantity/quantity_in_stock')
     if(!dUa)e.push('немає description_ua')
     if(dUa&&(dUa.length<30||dUa.length>60000))e.push('description_ua 30-60000')
     if(!params.length)e.push('немає param')
     params.forEach(pm=>{if(!pm.name)e.push('param без name');if(!pm.value)e.push('param без значення');paramCounts[pm.name||'без назви']=(paramCounts[pm.name||'без назви']||0)+1})
-    Array.from(o.attributes || []).forEach(a=>{attrCounts[a.name]=(attrCounts[a.name]||0)+1})
+    ;[].slice.call(o.attributes).forEach(a=>{attrCounts[a.name]=(attrCounts[a.name]||0)+1})
     e.forEach(x=>{errCounts[x]=(errCounts[x]||0)+1;errCount++})
     w.forEach(x=>{warnCounts[x]=(warnCounts[x]||0)+1;warnCount++})
     if(e.length)invalid++;else valid++
-    products.push({id,name:nameUa||nameRu||'—',vendor,categoryId,price,currency,status:e.length?'invalid':'valid',errors:e,warnings:w,pictures:pics,available:o.getAttribute('available')||'—',article:getNodeText(o,'article')||'—',descriptionUa:dUa,params})
+    products.push({id,name:nameUa||nameRu||'—',vendor,categoryId,price,currency,status:e.length?'invalid':'valid',errors:e,warnings:w,pictures:pics,available:o.getAttribute('available')||'—',article:cv(o.querySelector('article')&&o.querySelector('article').textContent)||'—',descriptionUa:dUa,params})
   })
   return{errCounts,warnCounts,products,attrCounts,paramCounts,total,valid,invalid,cats,errCount,warnCount}
 }
-
-function renderWorkerValidationResult(r){
-  document.getElementById('vT').textContent=r.total||0
-  document.getElementById('vV').textContent=r.valid||0
-  document.getElementById('vI').textContent=r.invalid||0
-  document.getElementById('vC').textContent=r.cats||0
-  document.getElementById('vStep3').style.display='block'
-  let msg=''
-  if(!r.errCount&&!r.warnCount) msg='<div class="rok">🎉 XML повністю валідний!</div>'
-  else if(r.truncatedProducts) msg='<div class="hint">Показано тільки перші 500 товарів у списку. Загальна статистика по всьому XML повна.</div>'
-  document.getElementById('vMsg').innerHTML=msg
-  document.getElementById('errSumWrap').style.display=r.errCount?'block':'none'
-  document.getElementById('warnSumWrap').style.display=r.warnCount?'block':'none'
-  document.getElementById('errSum').innerHTML=Object.entries(r.errCounts||{}).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('')
-  document.getElementById('warnSum').innerHTML=Object.entries(r.warnCounts||{}).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('')
-  eErrRows=(r.products||[]).filter(x=>x.status==='invalid').map(x=>({row:'—',id:x.id,name:x.name,errors:(x.errors||[]).join('; ')}))
-  prodRows=r.products||[]
-  prodFiltered=[...prodRows]
-  fillCats()
-  pPage=1
-  renderProducts()
-  document.getElementById('vProducts').style.display='block'
-  attrMap=r.attrCounts||{}
-  paramMap=r.paramCounts||{}
-  renderStructure()
-  document.getElementById('vStruct').style.display='block'
-}
-
-function validateXml(){
-  if(!xmlCnt){alert('Завантажте XML');return}
-  animateProg('vProg','vRing','vPl',1200,'Перевірка EVA...',()=>{
-    const r=doVal(xmlCnt)
-    document.getElementById('vT').textContent=r.total
-    document.getElementById('vV').textContent=r.valid
-    document.getElementById('vI').textContent=r.invalid
-    document.getElementById('vC').textContent=r.cats
-    document.getElementById('vStep3').style.display='block'
-    document.getElementById('vMsg').innerHTML=(!r.errCount&&!r.warnCount)?'<div class="rok">🎉 XML повністю валідний!</div>':''
-    document.getElementById('errSumWrap').style.display=r.errCount?'block':'none'
-    document.getElementById('warnSumWrap').style.display=r.warnCount?'block':'none'
-    document.getElementById('errSum').innerHTML=Object.entries(r.errCounts).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('')
-    document.getElementById('warnSum').innerHTML=Object.entries(r.warnCounts).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('')
-    eErrRows=r.products.filter(x=>x.status==='invalid').map(x=>({row:'—',id:x.id,name:x.name,errors:x.errors.join('; ')}))
-    prodRows=r.products
-    prodFiltered=[...prodRows]
-    fillCats()
-    pPage=1
-    renderProducts()
-    document.getElementById('vProducts').style.display='block'
-    attrMap=r.attrCounts
-    paramMap=r.paramCounts
-    renderStructure()
-    document.getElementById('vStruct').style.display='block'
-  })
-}
-
+function validateXml(){if(!xmlCnt){alert('Завантажте XML');return}animateProg('vProg','vRing','vPl',1200,'Перевірка EVA...',()=>{const r=doVal(xmlCnt);document.getElementById('vT').textContent=r.total;document.getElementById('vV').textContent=r.valid;document.getElementById('vI').textContent=r.invalid;document.getElementById('vC').textContent=r.cats;document.getElementById('vStep3').style.display='block';document.getElementById('vMsg').innerHTML=(!r.errCount&&!r.warnCount)?'<div class="rok">🎉 XML повністю валідний!</div>':'';document.getElementById('errSumWrap').style.display=r.errCount?'block':'none';document.getElementById('warnSumWrap').style.display=r.warnCount?'block':'none';document.getElementById('errSum').innerHTML=Object.entries(r.errCounts).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('');document.getElementById('warnSum').innerHTML=Object.entries(r.warnCounts).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('');eErrRows=r.products.filter(x=>x.status==='invalid').map(x=>({row:'—',id:x.id,name:x.name,errors:x.errors.join('; ')}));prodRows=r.products;prodFiltered=[...prodRows];fillCats();pPage=1;renderProducts();document.getElementById('vProducts').style.display='block';attrMap=r.attrCounts;paramMap=r.paramCounts;renderStructure();document.getElementById('vStruct').style.display='block'})}
 function fillCats(){const s=document.getElementById('pCat');const cats=[...new Set(prodRows.map(r=>r.categoryId))].sort();s.innerHTML='<option value="all">Всі категорії</option>'+cats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('')}
 function applyProductFilters(){const q=document.getElementById('pSearch').value.trim().toLowerCase(),st=document.getElementById('pStatus').value,cat=document.getElementById('pCat').value;prodFiltered=prodRows.filter(r=>((r.id+' '+r.name+' '+r.vendor).toLowerCase().includes(q))&&(st==='all'||r.status===st)&&(cat==='all'||r.categoryId===cat));pPage=1;renderProducts()}
 function setProductView(v){pView=v;document.getElementById('vTableBtn').classList.toggle('act',v==='table');document.getElementById('vCardBtn').classList.toggle('act',v==='cards');document.getElementById('pTableWrap').style.display=v==='table'?'block':'none';document.getElementById('pCards').style.display=v==='cards'?'grid':'none';renderProducts()}
 function chgPage(d){const pages=Math.max(1,Math.ceil(prodFiltered.length/pSize));pPage=Math.min(pages,Math.max(1,pPage+d));renderProducts()}
 function renderProducts(){const pages=Math.max(1,Math.ceil(prodFiltered.length/pSize));if(pPage>pages)pPage=pages;document.getElementById('pPage').textContent=`${pPage}/${pages}`;const st=(pPage-1)*pSize,arr=prodFiltered.slice(st,st+pSize)
 document.getElementById('pBody').innerHTML=arr.map((r,i)=>`<tr><td>${esc(r.id)}</td><td>${esc(r.name)}</td><td>${esc(r.categoryId)}</td><td>${esc(r.price)} ${esc(r.currency)}</td><td style="color:${r.status==='valid'?'#1DB954':'#FF3B3B'}">${r.status==='valid'?'Валідний':'Помилки'}</td><td><button class="tprev" onclick="openCard(${st+i})">Картка</button></td></tr>`).join('')||'<tr><td colspan="6">Нічого не знайдено</td></tr>'
-document.getElementById('pCards').innerHTML=arr.map((r,i)=>`<div class="pcard">${r.pictures&&r.pictures[0]?`<img class="pimg" src="${esc(r.pictures[0])}" alt="">`:`<div class="pimg" style="display:flex;align-items:center;justify-content:center;color:var(--muted)">Немає фото</div>`}<div class="pbody"><div class="pt">${esc(r.name)}</div><div class="pm">ID: ${esc(r.id)}</div><div class="pm">Бренд: ${esc(r.vendor)}</div><div class="pm">Ціна: ${esc(r.price)} ${esc(r.currency)}</div><div class="pm">Категорія: ${esc(r.categoryId)}</div><button class="tprev" onclick="openCard(${st+i})">Повна картка</button></div></div>`).join('')||'<div class="pm">Нічого не знайдено</div>'}
-function openCard(i){const p=prodFiltered[i];if(!p)return;const thumbs=(p.pictures||[]).map(u=>`<img style="width:62px;height:62px;object-fit:cover;border:1px solid var(--border);border-radius:7px;cursor:pointer" src="${esc(u)}" onclick="setMain('${esc(u)}')">`).join('');const params=(p.params||[]).map(pm=>`<tr><td>${esc(pm.name||'—')}</td><td>${esc(pm.value||'—')}</td></tr>`).join('')||'<tr><td colspan="2">Параметри відсутні</td></tr>';document.getElementById('mbox').innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center"><b>${esc(p.name)}</b><button class="tprev" onclick="forceClose()">Закрити ✕</button></div><div style="display:grid;grid-template-columns:1.1fr .9fr;gap:12px;margin-top:10px">${p.pictures&&p.pictures[0]?`<div><img id="mainPic" style="width:100%;max-height:360px;object-fit:contain;border:1px solid var(--border);border-radius:10px" src="${esc(p.pictures[0])}"><div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:8px">${thumbs}</div></div>`:`<div style="height:260px;display:flex;align-items:center;justify-content:center;color:var(--muted);border:1px solid var(--border);border-radius:10px">Немає фото</div>`}<div><div class="pm">ID: ${esc(p.id)}</div><div class="pm">Артикул: ${esc(p.article)}</div><div class="pm">Бренд: ${esc(p.vendor)}</div><div class="pm">Категорія: ${esc(p.categoryId)}</div><div class="pm">Ціна: ${esc(p.price)} ${esc(p.currency)}</div><div class="pm">Наявність: ${esc(p.available)}</div><div class="pm">Помилки: ${esc((p.errors||[]).join('; ')||'немає')}</div><div class="pm">Попередження: ${esc((p.warnings||[]).join('; ')||'немає')}</div></div></div><div class="pm" style="margin-top:10px">${esc(p.descriptionUa||'—')}</div><table class="prod-table"><thead><tr><th>Параметр</th><th>Значення</th></tr></thead><tbody>${params}</tbody></table>`;document.getElementById('pmodal').classList.add('show')}
+document.getElementById('pCards').innerHTML=arr.map((r,i)=>`<div class="pcard">${r.pictures[0]?`<img class="pimg" src="${esc(r.pictures[0])}" alt="">`:`<div class="pimg" style="display:flex;align-items:center;justify-content:center;color:var(--muted)">Немає фото</div>`}<div class="pbody"><div class="pt">${esc(r.name)}</div><div class="pm">ID: ${esc(r.id)}</div><div class="pm">Бренд: ${esc(r.vendor)}</div><div class="pm">Ціна: ${esc(r.price)} ${esc(r.currency)}</div><div class="pm">Категорія: ${esc(r.categoryId)}</div><button class="tprev" onclick="openCard(${st+i})">Повна картка</button></div></div>`).join('')||'<div class="pm">Нічого не знайдено</div>'}
+function openCard(i){const p=prodFiltered[i];if(!p)return;const thumbs=p.pictures.map(u=>`<img style="width:62px;height:62px;object-fit:cover;border:1px solid var(--border);border-radius:7px;cursor:pointer" src="${esc(u)}" onclick="setMain('${esc(u)}')">`).join('');const params=p.params.map(pm=>`<tr><td>${esc(pm.name||'—')}</td><td>${esc(pm.value||'—')}</td></tr>`).join('')||'<tr><td colspan="2">Параметри відсутні</td></tr>';document.getElementById('mbox').innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center"><b>${esc(p.name)}</b><button class="tprev" onclick="forceClose()">Закрити ✕</button></div><div style="display:grid;grid-template-columns:1.1fr .9fr;gap:12px;margin-top:10px">${p.pictures[0]?`<div><img id="mainPic" style="width:100%;max-height:360px;object-fit:contain;border:1px solid var(--border);border-radius:10px" src="${esc(p.pictures[0])}"><div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:8px">${thumbs}</div></div>`:`<div style="height:260px;display:flex;align-items:center;justify-content:center;color:var(--muted);border:1px solid var(--border);border-radius:10px">Немає фото</div>`}<div><div class="pm">ID: ${esc(p.id)}</div><div class="pm">Артикул: ${esc(p.article)}</div><div class="pm">Бренд: ${esc(p.vendor)}</div><div class="pm">Категорія: ${esc(p.categoryId)}</div><div class="pm">Ціна: ${esc(p.price)} ${esc(p.currency)}</div><div class="pm">Наявність: ${esc(p.available)}</div><div class="pm">Помилки: ${esc(p.errors.join('; ')||'немає')}</div><div class="pm">Попередження: ${esc(p.warnings.join('; ')||'немає')}</div></div></div><div class="pm" style="margin-top:10px">${esc(p.descriptionUa||'—')}</div><table class="prod-table"><thead><tr><th>Параметр</th><th>Значення</th></tr></thead><tbody>${params}</tbody></table>`;document.getElementById('pmodal').classList.add('show')}
 function setMain(src){const i=document.getElementById('mainPic');if(i)i.src=src}
-function closeModal(e){if(e.target.id==='pmodal')forceClose()}
-function forceClose(){document.getElementById('pmodal').classList.remove('show')}
+function closeModal(e){if(e.target.id==='pmodal')forceClose()}function forceClose(){document.getElementById('pmodal').classList.remove('show')}
 function renderStructure(){document.getElementById('attrBody').innerHTML=Object.entries(attrMap).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('')||'<tr><td colspan="2">Немає даних</td></tr>';document.getElementById('paramBody').innerHTML=Object.entries(paramMap).sort((a,b)=>b[1]-a[1]).slice(0,50).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('')||'<tr><td colspan="2">Немає даних</td></tr>'}
 function dlXml(t){const c=t==='excel'?xmlRes:xmlCnt;if(!c)return;const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:'application/xml'}));a.download=t==='excel'?'eva_pricelist.xml':'eva_validated.xml';a.click()}
 function copyLink(){if(!xmlRes)return;navigator.clipboard.writeText('data:application/xml;base64,'+btoa(unescape(encodeURIComponent(xmlRes)))).then(()=>alert('✅ Посилання скопійовано')).catch(()=>dlXml('excel'))}
 function dlErrReport(){if(!eErrRows.length){alert('Помилок не знайдено');return}const wb=XLSX.utils.book_new();const ws=XLSX.utils.aoa_to_sheet([['Рядок','Offer ID','Назва','Помилки'],...eErrRows.map(r=>[r.row,r.id,r.name,r.errors])]);ws['!cols']=[{wch:10},{wch:18},{wch:34},{wch:60}];XLSX.utils.book_append_sheet(wb,ws,'Помилки');XLSX.writeFile(wb,`eva_errors_${new Date().toISOString().slice(0,10)}.xlsx`)}
-
-document.addEventListener('DOMContentLoaded',()=>{
-  bindTabs()
-  switchTab('excel')
-})
 </script>
 </body>
 </html>
