@@ -113,7 +113,8 @@ async function loadUrl(){
       return
     }
     const t=await b.text()
-    if(!t.trim().startsWith('<'))throw new Error('Отримано не XML')
+    const trimmed=t.replace(/^\uFEFF/,'').trimStart()
+    if(!trimmed.startsWith('<')){throw new Error('Отримано не XML')}
     xmlCnt=t
     st.style.color='var(--green)'
     st.textContent='✅ XML завантажено через Worker'
@@ -136,7 +137,6 @@ function doVal(c){
   let total=0,valid=0,invalid=0,cats=doc.querySelectorAll('categories category').length,errCount=0,warnCount=0
   if(doc.querySelector('parsererror'))return{errCounts:{'XML не валідний':1},warnCounts,products,attrCounts,paramCounts,total:0,valid:0,invalid:0,cats:0,errCount:1,warnCount:0}
   if(!doc.querySelector('shop'))return{errCounts:{'Відсутній тег shop':1},warnCounts,products,attrCounts,paramCounts,total:0,valid:0,invalid:0,cats:0,errCount:1,warnCount:0}
-
   const date=(doc.querySelector('yml_catalog')&&doc.querySelector('yml_catalog').getAttribute('date'))||''
   const ids=new Set(),names=new Set()
   doc.querySelectorAll('shop offers offer').forEach(o=>{
@@ -153,7 +153,6 @@ function doVal(c){
     const pics=[].slice.call(o.querySelectorAll('picture')).map(x=>cv(x.textContent)).filter(Boolean)
     const dUa=cv(o.querySelector('description_ua')&&o.querySelector('description_ua').textContent)
     const params=[].slice.call(o.querySelectorAll('param')).map(p=>({name:cv(p.getAttribute('name')),value:cv(p.textContent)}))
-
     if(!/^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}$/.test(date))e.push('некоректний yml_catalog@date')
     if(!id||id==='—')e.push('немає id');else if(ids.has(id))e.push('дублікат id');else ids.add(id)
     if(!nameUa)e.push('немає name_ua')
