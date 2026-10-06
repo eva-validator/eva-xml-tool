@@ -235,16 +235,40 @@ function animateProg(wrap,ring,label,ms,text,done){
     if(p<100)requestAnimationFrame(step);else{w.classList.remove('show');done&&done()}
   })(performance.now());
 }
+function uniquifyHeaders(headerRow){
+  const seen={};
+  return headerRow.map((h,i)=>{
+    let base=cv(h);
+    if(!base) base='__EMPTY_'+i;
+    const n=seen[base]||0;
+    seen[base]=n+1;
+    return n===0?base:base+'.'+n;
+  });
+}
 function readAllExcelSheets(wb){
   const sheets=[];
   (wb.SheetNames||[]).forEach(name=>{
     const ws=wb.Sheets[name];
     if(!ws) return;
-    const rows=XLSX.utils.sheet_to_json(ws,{defval:'',raw:false});
+    const aoa=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:false,blankrows:false});
+    if(!aoa.length) return;
+    let headerIdx=0;
+    for(let i=0;i<Math.min(12,aoa.length);i++){
+      const nonempty=(aoa[i]||[]).filter(x=>cv(x)!=='').length;
+      if(nonempty>=3){headerIdx=i;break;}
+    }
+    const headers=uniquifyHeaders((aoa[headerIdx]||[]).map(x=>cv(x)));
+    if(!headers.filter(h=>!/^__EMPTY_/.test(h)).length) return;
+    const rows=[];
+    for(let r=headerIdx+1;r<aoa.length;r++){
+      const line=aoa[r]||[];
+      if(!line.some(x=>cv(x)!=='')) continue;
+      const obj={};
+      headers.forEach((h,c)=>{obj[h]=line[c]==null||line[c]===undefined?'':line[c];});
+      rows.push(obj);
+    }
     if(!rows.length) return;
-    const keys=Object.keys(rows[0]||{});
-    if(!keys.length) return;
-    sheets.push({name, rows, keys});
+    sheets.push({name, rows, keys:headers});
   });
   return sheets;
 }
@@ -393,28 +417,53 @@ function collectPhotos(row, mapped){
   });
   return [...new Set(urls)];
 }
+function charColKind(header){
+  const n=normHeader(header).replace(/^__empty \d+$/,'');
+  if(/^(характеристика|назва характеристики|название характеристики|параметр|param|property|атрибут)(\s+\d+)?$/.test(n)) return 'name';
+  if(/^(значение|значення|value|значення характеристики|значение характеристики)(\s+\d+)?$/.test(n)) return 'value';
+  return '';
+}
+function paramSuffix(header){
+  const m=normHeader(header).match(/(\d+)$/);
+  return m?m[1]:'0';
+}
 function collectParams(row, mapped){
   const params=[];
-  mapped._keys.forEach(k=>{
-    const n=normHeader(k);
-    const m=n.match(/^(характеристика|параметр|param|property)\s*(\d+)?$/);
-    if(!m) return;
-    const idx=m[2]||'';
-    const valKey=mapped._keys.find(x=>{
-      const vn=normHeader(x);
-      return vn===`значение ${idx}`.trim() || vn===`значення ${idx}`.trim() || vn===`value ${idx}`.trim()
-        || vn===`значение${idx}` || vn===`значення${idx}` || vn===`value${idx}`;
-    });
-    const name=cv(row[k]);
-    const value=valKey?cv(row[valKey]):'';
-    if(name||value) params.push({name,value});
+  const seen=new Set();
+  const push=(name,value)=>{
+    const n=cv(name),v=cv(value);
+    if(!n&&!v) return;
+    const key=n+'|||'+v;
+    if(seen.has(key)) return;
+    seen.add(key);
+    params.push({name:n,value:v});
+  };
+  const keys=mapped._keys||[];
+  const nameCols=keys.filter(k=>charColKind(k)==='name');
+  const valCols=keys.filter(k=>charColKind(k)==='value');
+  const used=new Set();
+  nameCols.forEach(nk=>{
+    const suf=paramSuffix(nk);
+    let vk=valCols.find(v=>!used.has(v) && paramSuffix(v)===suf);
+    if(!vk) vk=valCols.find(v=>!used.has(v));
+    if(vk) used.add(vk);
+    used.add(nk);
+    push(row[nk], vk?row[vk]:'');
   });
-  for(let k=0;k<=40;k++){
-    const s=k?'.'+k:'';
-    const ch=cv(row['Характеристика'+s]);
-    const va=cv(row['Значение'+s]||row['Значення'+s]);
-    if((ch||va) && !params.some(p=>p.name===ch && p.value===va)) params.push({name:ch,value:va});
-  }
+  valCols.forEach(vk=>{
+    if(used.has(vk)) return;
+    used.add(vk);
+    push('', row[vk]);
+  });
+  keys.forEach(k=>{
+    if(used.has(k)) return;
+    if(mapped._used && mapped._used.has(k)) return;
+    if(/^__EMPTY_/.test(k)) return;
+    const n=normHeader(k);
+    if(/(фото|зображ|изображ|picture|image|photo)/.test(n)) return;
+    const v=cv(row[k]);
+    if(v) push(String(k).replace(/\.\d+$/,''), v);
+  });
   return params;
 }
 function parseAvailable(raw, stockRaw){
